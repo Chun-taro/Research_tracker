@@ -10,7 +10,7 @@ class EnsureTenantIsActive
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $tenant = app('currentTenant');
+        $tenant = app()->bound('currentTenant') ? app('currentTenant') : null;
 
         if (!$tenant || !$tenant->is_active) {
             abort(403, 'This department account is inactive or not found.');

@@ -22,7 +22,7 @@ class EnsureLandlord
         }
 
         // Must NOT be in a tenant context (must be on the main domain/central system)
-        if (app()->has('currentTenant') && app('currentTenant') !== null) {
+        if (app()->bound('currentTenant') && app('currentTenant') !== null) {
             // If they are a superadmin but tried to access a tenant URL, we might want to allow 
             // but usually landlord dashboard is root domain only.
             // For now, let's just ensure they are on the central system for landlord routes.

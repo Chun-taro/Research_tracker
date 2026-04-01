@@ -139,6 +139,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_name');
             $table->boolean('is_archived')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
 

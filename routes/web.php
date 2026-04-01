@@ -16,7 +16,7 @@ use Inertia\Inertia;
 
 // Landing page
 Route::get('/', function () {
-    if (app('currentTenant')) {
+    if (app()->bound('currentTenant') && app('currentTenant')) {
         return Inertia::render('TenantWelcome');
     }
     return Inertia::render('Welcome');

@@ -15,8 +15,11 @@ class TenantSubscriptionController extends Controller
 {
     public function index()
     {
-        // Get the current tenant to display its subscription status.
-        $tenantId = app('currentTenant')->id;
+        $tenantId = app()->bound('currentTenant') ? app('currentTenant')->id : null;
+
+        if (!$tenantId) {
+            return redirect()->route('dashboard');
+        }
         
         // We need to query the central landlord database for the subscription information of the current tenant
         $tenant = Tenant::on('landlord')->find($tenantId);
@@ -49,7 +52,8 @@ class TenantSubscriptionController extends Controller
             'premium' => 4000,
         ];
         $priceInCents = $prices[$tier] * 100;
-        $tenantId = app('currentTenant')->id;
+        $tenantId = app()->bound('currentTenant') ? app('currentTenant')->id : null;
+        if (!$tenantId) { abort(403); }
 
         $secret = config('services.stripe.secret');
 
@@ -72,7 +76,7 @@ class TenantSubscriptionController extends Controller
                     'currency' => 'php',
                     'product_data' => [
                         'name' => ucfirst($tier) . ' Subscription Plan',
-                        'description' => '1 Year Subscription for ' . app('currentTenant')->name,
+                        'description' => '1 Year Subscription for ' . (app()->bound('currentTenant') ? app('currentTenant')->name : 'Department'),
                     ],
                     'unit_amount' => $priceInCents,
                 ],

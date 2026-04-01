@@ -38,7 +38,7 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'tenant_id' => app('currentTenant')?->id,
+            'tenant_id' => app()->bound('currentTenant') ? app('currentTenant')->id : null,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
