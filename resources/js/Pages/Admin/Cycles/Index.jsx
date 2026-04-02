@@ -5,6 +5,19 @@ import { StatusBadge } from '@/Components/StatusBadge';
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, X, Calendar } from 'lucide-react';
 
+const Field = ({ label, type = 'text', name, data, setData, ...props }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+        <input 
+            type={type} 
+            value={data[name] || ''} 
+            onChange={e => setData(prev => ({ ...prev, [name]: e.target.value }))}
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" 
+            {...props} 
+        />
+    </div>
+);
+
 function CycleModal({ cycle, onClose }) {
     const [data, setData] = useState({
         name: cycle?.name ?? '',
@@ -30,14 +43,6 @@ function CycleModal({ cycle, onClose }) {
         }
     };
 
-    const Field = ({ label, type = 'text', name, ...props }) => (
-        <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
-            <input type={type} value={data[name]} onChange={e => setData(prev => ({ ...prev, [name]: e.target.value }))}
-                className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" {...props} />
-        </div>
-    );
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
@@ -46,9 +51,9 @@ function CycleModal({ cycle, onClose }) {
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <Field label="Cycle Name" name="name" required />
+                    <Field label="Cycle Name" name="name" data={data} setData={setData} required />
                     <div className="grid grid-cols-2 gap-4">
-                        <Field label="Academic Year" name="academic_year" placeholder="2025-2026" required />
+                        <Field label="Academic Year" name="academic_year" placeholder="2025-2026" data={data} setData={setData} required />
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester</label>
                             <select value={data.semester} onChange={e => setData(prev => ({ ...prev, semester: e.target.value }))}
@@ -60,16 +65,16 @@ function CycleModal({ cycle, onClose }) {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <Field label="Start Date" type="date" name="start_date" required />
-                        <Field label="End Date" type="date" name="end_date" required />
+                        <Field label="Start Date" type="date" name="start_date" data={data} setData={setData} required />
+                        <Field label="End Date" type="date" name="end_date" data={data} setData={setData} required />
                     </div>
                     <hr className="border-gray-100 dark:border-gray-800" />
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Deadlines</p>
                     <div className="grid grid-cols-2 gap-4">
-                        <Field label="Proposal Deadline" type="date" name="proposal_deadline" />
-                        <Field label="Chapter Deadline" type="date" name="chapter_deadline" />
-                        <Field label="Final Manuscript Deadline" type="date" name="final_deadline" />
-                        <Field label="Defense Deadline" type="date" name="defense_deadline" />
+                        <Field label="Proposal Deadline" type="date" name="proposal_deadline" data={data} setData={setData} />
+                        <Field label="Chapter Deadline" type="date" name="chapter_deadline" data={data} setData={setData} />
+                        <Field label="Final Manuscript Deadline" type="date" name="final_deadline" data={data} setData={setData} />
+                        <Field label="Defense Deadline" type="date" name="defense_deadline" data={data} setData={setData} />
                     </div>
                     {cycle && (
                         <div>

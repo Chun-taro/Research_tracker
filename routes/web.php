@@ -86,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['landlord'])->prefix('landlord')->name('landlord.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
         Route::resource('tenants', \App\Http\Controllers\Landlord\TenantController::class);
+        Route::post('tenants/{tenant}/mock-subscription', [\App\Http\Controllers\Landlord\TenantController::class, 'mockSubscription'])->name('tenants.mock-subscription');
         Route::get('subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');
     });
 

@@ -68,7 +68,7 @@ class TenantController extends Controller
 
         // Send Welcome Email
         \Illuminate\Support\Facades\Mail::to($validated['admin_email'])
-            ->send(new \App\Mail\TenantWelcomeEmail($tenant, $validated['admin_password']));
+            ->send(new \App\Mail\TenantWelcomeEmail($tenant, $validated['admin_password'], $validated['admin_name'], $validated['admin_email']));
 
         return redirect()->back()->with('success', 'Department created and database provisioned successfully.');
     }
@@ -86,6 +86,48 @@ class TenantController extends Controller
         $tenant->update($validated);
 
         return redirect()->back()->with('success', 'Department updated successfully.');
+    }
+
+    public function mockSubscription(Request $request, Tenant $tenant)
+    {
+        $tier = $request->get('tier', 'premium');
+        $prices = [
+            'basic' => 1000.00,
+            'standard' => 2500.00,
+            'premium' => 4000.00,
+        ];
+
+        $amount = $prices[$tier] ?? 4000.00;
+        $expiresAt = now()->addYear(); // Standard subscription is 1 year
+
+        \Illuminate\Support\Facades\DB::connection('landlord')->transaction(function () use ($tenant, $tier, $amount, $expiresAt) {
+            $tenant->update([
+                'subscription_tier' => $tier,
+                'subscription_expires_at' => $expiresAt,
+                'is_active' => true,
+            ]);
+
+            $subscription = \App\Models\Subscription::create([
+                'tenant_id' => $tenant->id,
+                'tier' => $tier,
+                'amount' => $amount,
+                'starts_at' => now(),
+                'expires_at' => $expiresAt,
+                'status' => 'active',
+            ]);
+
+            \App\Models\Payment::create([
+                'tenant_id' => $tenant->id,
+                'subscription_id' => $subscription->id,
+                'amount' => $amount,
+                'method' => 'mock_upgrade',
+                'reference_number' => 'MOCK-' . strtoupper(\Illuminate\Support\Str::random(10)),
+                'status' => 'paid',
+                'paid_at' => now(),
+            ]);
+        });
+
+        return redirect()->back()->with('success', "Mock subscription activated! Tier set to " . ucfirst($tier) . " (\u20b1" . number_format($amount, 2) . ") for 1 year.");
     }
 
     public function destroy(Tenant $tenant)

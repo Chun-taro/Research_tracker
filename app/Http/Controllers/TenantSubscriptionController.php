@@ -24,6 +24,7 @@ class TenantSubscriptionController extends Controller
         // We need to query the central landlord database for the subscription information of the current tenant
         $tenant = Tenant::on('landlord')->find($tenantId);
         $subscription = Subscription::on('landlord')->where('tenant_id', $tenantId)->latest()->first();
+        $payments = Payment::on('landlord')->with('subscription')->where('tenant_id', $tenantId)->latest()->take(5)->get();
 
         // Pass available plans
         $plans = [
@@ -35,6 +36,7 @@ class TenantSubscriptionController extends Controller
         return Inertia::render('Admin/Billing', [
             'tenant' => $tenant,
             'subscription' => $subscription,
+            'payments' => $payments,
             'plans' => $plans,
         ]);
     }

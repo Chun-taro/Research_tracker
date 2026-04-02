@@ -1,7 +1,7 @@
 import LandlordLayout from '@/Layouts/LandlordLayout';
 import { Head, router, useForm } from '@inertiajs/react';
 import { PageHeader } from '@/Components/PageHeader';
-import { Plus, Search, Edit2, Trash2, X, Globe, ExternalLink, Settings } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Globe, ExternalLink, Settings, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -158,6 +158,23 @@ export default function TenantIndex({ tenants, filters }) {
                                     <Globe size={20} />
                                 </div>
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center bg-amber-50/50 rounded-lg px-1 py-0.5 border border-amber-100 shadow-sm mr-1">
+                                        <button 
+                                            onClick={() => router.post(`/landlord/tenants/${tenant.id}/mock-subscription`, { tier: 'basic' })} 
+                                            title="Mock Basic (₱1,000)"
+                                            className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-amber-600 hover:bg-amber-500 hover:text-white rounded-md transition-all"
+                                        >B</button>
+                                        <button 
+                                            onClick={() => router.post(`/landlord/tenants/${tenant.id}/mock-subscription`, { tier: 'standard' })} 
+                                            title="Mock Standard (₱2,500)"
+                                            className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-amber-600 hover:bg-amber-500 hover:text-white rounded-md transition-all"
+                                        >S</button>
+                                        <button 
+                                            onClick={() => router.post(`/landlord/tenants/${tenant.id}/mock-subscription`, { tier: 'premium' })} 
+                                            title="Mock Premium (₱4,000)"
+                                            className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-amber-600 hover:bg-amber-500 hover:text-white rounded-md transition-all"
+                                        >P</button>
+                                    </div>
                                     <button onClick={() => setModal(tenant)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all"><Edit2 size={16} /></button>
                                     <button onClick={() => router.delete(`/landlord/tenants/${tenant.id}`)} className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all"><Trash2 size={16} /></button>
                                 </div>

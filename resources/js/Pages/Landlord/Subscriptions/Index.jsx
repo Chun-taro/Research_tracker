@@ -13,7 +13,7 @@ export default function SubscriptionIndex({ subscriptions, payments, revenue_tot
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
                 <div className="lg:col-span-1 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-6 text-white shadow-lg shadow-indigo-200">
                     <p className="text-indigo-100 text-sm font-medium mb-1">Total Lifetime Revenue</p>
-                    <h2 className="text-3xl font-bold mb-4">\u20b1{revenue_total?.toLocaleString()}</h2>
+                    <h2 className="text-3xl font-bold mb-4">₱{revenue_total?.toLocaleString()}</h2>
                     <div className="flex items-center gap-2 text-xs bg-white/10 w-fit px-2 py-1 rounded-md">
                         <ArrowUpRight size={14} /> <span>12% from last month</span>
                     </div>
@@ -92,7 +92,7 @@ export default function SubscriptionIndex({ subscriptions, payments, revenue_tot
                                     <tr key={pay.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-4 text-slate-400 font-mono text-[10px]">{pay.reference_number || 'INV-'+pay.id}</td>
                                         <td className="px-6 py-4 font-medium text-slate-700">{pay.tenant?.name}</td>
-                                        <td className="px-6 py-4 font-bold text-slate-900">\u20b1{pay.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-4 font-bold text-slate-900">₱{pay.amount.toLocaleString()}</td>
                                         <td className="px-6 py-4 text-slate-500">
                                              <span className="px-2 py-0.5 bg-green-50 text-green-700 rounded text-[10px] font-bold uppercase">{pay.status}</span>
                                         </td>

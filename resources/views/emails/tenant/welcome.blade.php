@@ -1,14 +1,14 @@
 <x-mail::message>
 # Welcome to Research Tracker!
 
-Hi there,
+Hi {{ $adminName }},
 
 Your department, **{{ $tenant->name }}**, has been successfully provisioned on the central platform. 
 
 You can now log in to your dedicated portal using the initial credentials below:
 
 **Portal URL:** [http://{{ $tenant->domain }}](http://{{ $tenant->domain }})  
-**Email:** (The email address this was sent to)  
+**Email:** `{{ $adminEmail }}`  
 **Password:** `{{ $password }}`
 
 Please ensure you change your password immediately after your first login for security purposes.

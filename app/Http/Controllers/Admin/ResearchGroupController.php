@@ -88,28 +88,62 @@ class ResearchGroupController extends Controller
     public function studentGroup(Request $request)
     {
         $user = $request->user();
+        $tenantId = $user->tenant_id;
         $member = $user->groupMemberships()->with('group.adviser', 'group.panelists.panelist', 'group.cycle', 'group.submissions.latestVersion')->first();
-        return Inertia::render('Student/Group', ['group' => $member?->group, 'memberRole' => $member?->role]);
+        
+        // Fetch active cycles first, fallback to all if none active
+        $cycles = \App\Models\ResearchCycle::where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->latest()
+            ->get();
+            
+        if ($cycles->isEmpty()) {
+            $cycles = \App\Models\ResearchCycle::where('tenant_id', $tenantId)->latest()->get();
+        }
+        
+        return Inertia::render('Student/Group', [
+            'group' => $member?->group, 
+            'memberRole' => $member?->role,
+            'availableCycles' => $cycles
+        ]);
     }
 
     public function createGroup(Request $request)
     {
-        $data = $request->validate([
+        $user = $request->user();
+        $tenantId = $user->tenant_id;
+        
+        // Guard: A student should only be in one group at a time
+        if ($user->groupMemberships()->exists()) {
+            return back()->withErrors([
+                'title' => 'You are already a member or leader of an existing research group.'
+            ]);
+        }
+
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'research_cycle_id' => 'required|exists:research_cycles,id',
+            'research_cycle_id' => [
+                'required',
+                // Explicitly check the 'mysql' connection which is the tenant's DB
+                \Illuminate\Validation\Rule::exists('mysql.research_cycles', 'id')->where('tenant_id', $tenantId),
+            ],
         ]);
 
-        $tenantId = $request->user()->tenant_id;
-        $group = ResearchGroup::create([...$data, 'tenant_id' => $tenantId]);
+        $group = ResearchGroup::create([
+            'tenant_id' => $tenantId,
+            'research_cycle_id' => $validated['research_cycle_id'],
+            'title' => $validated['title'],
+            'status' => 'draft',
+        ]);
 
         \App\Models\GroupMember::create([
             'tenant_id' => $tenantId,
             'research_group_id' => $group->id,
-            'user_id' => $request->user()->id,
+            'user_id' => $user->id,
             'role' => 'leader',
         ]);
 
-        return back()->with('success', 'Research group created.');
+        return back()->with('success', 'Research group created successfully! You are the group leader.');
     }
 
     public function joinGroup(Request $request)

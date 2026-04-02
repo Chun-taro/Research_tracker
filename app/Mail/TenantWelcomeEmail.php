@@ -17,7 +17,9 @@ class TenantWelcomeEmail extends Mailable
 
     public function __construct(
         public Tenant $tenant,
-        public string $password
+        public string $password,
+        public string $adminName,
+        public string $adminEmail
     ) {}
 
     public function envelope(): Envelope

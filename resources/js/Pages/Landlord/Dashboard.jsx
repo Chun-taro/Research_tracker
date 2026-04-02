@@ -50,7 +50,7 @@ export default function LandlordDashboard({ stats, recentTenants, tierDistributi
                 <StatsCard label="Total Departments" value={stats?.total_tenants} icon={Globe} color="indigo" />
                 <StatsCard label="Total Platform Users" value={stats?.total_users} icon={Users} color="blue" />
                 <StatsCard label="Active Subscriptions" value={stats?.active_subscriptions} icon={CreditCard} color="green" />
-                <StatsCard label="Total Revenue" value={`\u20b1${stats?.total_revenue?.toLocaleString()}`} icon={ShoppingBag} color="pink" />
+                <StatsCard label="Total Revenue" value={`₱${stats?.total_revenue?.toLocaleString()}`} icon={ShoppingBag} color="pink" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

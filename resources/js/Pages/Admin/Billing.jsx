@@ -5,7 +5,7 @@ import { CreditCard, CheckCircle2, AlertCircle, Shield, Zap, Building2, Download
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-export default function Billing({ tenant, subscription, plans }) {
+export default function Billing({ tenant, subscription, payments, plans }) {
     const [submitting, setSubmitting] = useState(false);
 
     const handleCheckout = (tier) => {
@@ -73,7 +73,7 @@ export default function Billing({ tenant, subscription, plans }) {
                         <div className="h-12 w-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center mb-6"><Shield size={24} /></div>
                         <h4 className="text-xl font-bold text-slate-900 mb-2">Basic</h4>
                         <div className="flex items-baseline gap-1 mb-6">
-                            <span className="text-4xl font-black text-slate-900">\u20b1{(plans.basic.price).toLocaleString()}</span>
+                            <span className="text-4xl font-black text-slate-900">₱{(plans.basic.price).toLocaleString()}</span>
                             <span className="text-slate-500 text-sm font-medium">/ year</span>
                         </div>
                         <ul className="space-y-4 mb-8 text-sm text-slate-600">
@@ -96,7 +96,7 @@ export default function Billing({ tenant, subscription, plans }) {
                         <div className="h-12 w-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6"><Zap size={24} /></div>
                         <h4 className="text-xl font-bold text-slate-900 mb-2">Standard</h4>
                         <div className="flex items-baseline gap-1 mb-6">
-                            <span className="text-4xl font-black text-slate-900">\u20b1{(plans.standard.price).toLocaleString()}</span>
+                            <span className="text-4xl font-black text-slate-900">₱{(plans.standard.price).toLocaleString()}</span>
                             <span className="text-slate-500 text-sm font-medium">/ year</span>
                         </div>
                         <ul className="space-y-4 mb-8 text-sm text-slate-600">
@@ -124,7 +124,7 @@ export default function Billing({ tenant, subscription, plans }) {
                             <div className="h-12 w-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center mb-6 border border-indigo-500/20"><CreditCard size={24} /></div>
                             <h4 className="text-xl font-bold text-white mb-2">Premium <span className="ml-2 text-[10px] bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded-full uppercase tracking-wider">Most Popular</span></h4>
                             <div className="flex items-baseline gap-1 mb-6">
-                                <span className="text-4xl font-black text-white">\u20b1{(plans.premium.price).toLocaleString()}</span>
+                                <span className="text-4xl font-black text-white">₱{(plans.premium.price).toLocaleString()}</span>
                                 <span className="text-slate-400 text-sm font-medium">/ year</span>
                             </div>
                             <ul className="space-y-4 mb-8 text-sm text-slate-300">
@@ -150,10 +150,50 @@ export default function Billing({ tenant, subscription, plans }) {
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-6">
                     <Download size={18} className="text-slate-400" /> Recent Invoices
                 </h3>
-                <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                    <CreditCard size={24} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm font-medium">Invoices will appear here after your first payment.</p>
-                </div>
+                
+                {payments && payments.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-slate-500">
+                            <thead className="text-xs text-slate-700 uppercase bg-slate-50 rounded-lg">
+                                <tr>
+                                    <th className="px-4 py-3">Date</th>
+                                    <th className="px-4 py-3">Reference</th>
+                                    <th className="px-4 py-3">Tier</th>
+                                    <th className="px-4 py-3 text-right">Amount</th>
+                                    <th className="px-4 py-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {payments.map((payment) => (
+                                    <tr key={payment.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                        <td className="px-4 py-4 font-medium text-slate-900">
+                                            {new Date(payment.paid_at).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-4 py-4 font-mono text-xs">
+                                            {payment.reference_number}
+                                        </td>
+                                        <td className="px-4 py-4 capitalize">
+                                            {payment.subscription?.tier || 'Upgrade'}
+                                        </td>
+                                        <td className="px-4 py-4 text-right font-bold text-slate-900">
+                                            ₱{(parseFloat(payment.amount)).toLocaleString()}
+                                        </td>
+                                        <td className="px-4 py-4 text-right">
+                                            <span className="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase rounded">
+                                                Paid
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <CreditCard size={24} className="mx-auto mb-2 opacity-50" />
+                        <p className="text-sm font-medium">Invoices will appear here after your first payment.</p>
+                    </div>
+                )}
             </div>
 
         </AuthenticatedLayout>

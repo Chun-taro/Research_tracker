@@ -18,11 +18,13 @@ export default function SettingsIndex({ tenant }) {
         e.preventDefault();
         setProcessing(true);
         const formData = new FormData();
+        formData.append('_method', 'PATCH'); // Laravel requires this for multipart/form-data PATCH
         Object.entries(data).forEach(([k, v]) => formData.append(k, v));
         if (logo) formData.append('logo', logo);
+        
         router.post('/admin/settings', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
             onFinish: () => setProcessing(false),
+            forceFormData: true,
         });
     };
 
