@@ -24,9 +24,9 @@ const statusConfig = {
     scheduled: { label: 'Scheduled', color: 'blue' },
     done: { label: 'Done', color: 'green' },
     cancelled: { label: 'Cancelled', color: 'red' },
-    basic: { label: 'Basic', color: 'gray' },
-    standard: { label: 'Standard', color: 'blue' },
-    premium: { label: 'Premium', color: 'purple' },
+    basic: { label: 'Basic', color: 'green' },
+    standard: { label: 'Standard', color: 'indigo' },
+    premium: { label: 'Premium', color: 'orange' },
 };
 
 export function StatusBadge({ status, className }) {

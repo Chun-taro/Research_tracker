@@ -60,7 +60,11 @@ export default function SubscriptionIndex({ subscriptions, payments, revenue_tot
                                     <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-6 py-4 font-semibold text-slate-900">{sub.tenant?.name}</td>
                                         <td className="px-6 py-4">
-                                            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded text-[10px] font-bold uppercase">{sub.tier}</span>
+                                            <span className={cn("px-2 py-0.5 rounded text-[10px] font-bold uppercase", 
+                                                sub.tier === 'premium' ? 'bg-amber-100 text-amber-700' : 
+                                                sub.tier === 'standard' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700')}>
+                                                {sub.tier}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 text-slate-500">{new Date(sub.expires_at).toLocaleDateString()}</td>
                                     </tr>

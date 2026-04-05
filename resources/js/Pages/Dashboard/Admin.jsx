@@ -107,7 +107,10 @@ export default function AdminDashboard({ stats, statusDistribution, upcomingDead
                             <div className="bg-white rounded-full h-2 transition-all" style={{ width: `${stats?.total_groups ? Math.round((stats?.completed_research / (stats?.total_groups || 1)) * 100) : 0}%` }} />
                         </div>
                     </div>
-                    <p className="text-blue-200 text-xs mt-6">Subscription: <span className="text-white font-semibold capitalize">{tenant?.subscription_tier} Plan</span></p>
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
+                        <span className="text-blue-200 text-[10px] uppercase font-bold tracking-wider">Subscription Plan</span>
+                        <StatusBadge status={tenant?.subscription_tier} />
+                    </div>
                 </div>
             </div>
 

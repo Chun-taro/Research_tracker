@@ -182,8 +182,8 @@ export default function TenantIndex({ tenants, filters }) {
                             <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">{tenant.name}</h3>
                             <div className="flex items-center gap-2 mb-4">
                                 <span className={cn('px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider', 
-                                    tenant.subscription_tier === 'premium' ? 'bg-indigo-100 text-indigo-700' : 
-                                    tenant.subscription_tier === 'standard' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600')}>
+                                    tenant.subscription_tier === 'premium' ? 'bg-amber-100 text-amber-700' : 
+                                    tenant.subscription_tier === 'standard' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700')}>
                                     {tenant.subscription_tier}
                                 </span>
                                 <span className={cn('h-1.5 w-1.5 rounded-full', tenant.is_active ? 'bg-green-500' : 'bg-slate-300')} />

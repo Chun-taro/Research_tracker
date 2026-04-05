@@ -2,6 +2,7 @@ import LandlordLayout from '@/Layouts/LandlordLayout';
 import { Head } from '@inertiajs/react';
 import { StatsCard } from '@/Components/StatsCard';
 import { PageHeader } from '@/Components/PageHeader';
+import { StatusBadge } from '@/Components/StatusBadge';
 import { Globe, Users, CreditCard, ShoppingBag, TrendingUp } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
@@ -20,13 +21,19 @@ export default function LandlordDashboard({ stats, recentTenants, tierDistributi
             const labels = Object.keys(tierDistribution ?? {});
             const values = Object.values(tierDistribution ?? {});
             
+            const colors = {
+                basic: '#10b981',    // Emerald-500
+                standard: '#6366f1', // Indigo-500
+                premium: '#f59e0b',  // Amber-500
+            };
+            
             chartInstance.current = new Chart(chartRef.current, {
                 type: 'pie',
                 data: {
                     labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
                     datasets: [{
                         data: values,
-                        backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899'],
+                        backgroundColor: labels.map(l => colors[l] || '#6B7280'),
                         borderWidth: 0
                     }],
                 },
@@ -70,7 +77,9 @@ export default function LandlordDashboard({ stats, recentTenants, tierDistributi
                                 {recentTenants?.map(t => (
                                     <tr key={t.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-4 py-3 font-medium text-slate-900">{t.name}</td>
-                                        <td className="px-4 py-3 capitalize">{t.subscription_tier}</td>
+                                        <td className="px-4 py-3">
+                                            <StatusBadge status={t.subscription_tier} />
+                                        </td>
                                         <td className="px-4 py-3">
                                             <span className={cn('px-2 py-0.5 rounded-full text-xs font-medium', t.is_active ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600')}>
                                                 {t.is_active ? 'Active' : 'Inactive'}
