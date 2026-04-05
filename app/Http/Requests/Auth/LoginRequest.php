@@ -33,16 +33,22 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws ValidationException
-     */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $email = $this->string('email');
+        $password = $this->string('password');
+
+        // 1. Authenticate against Central Hub (Landlord DB)
+        $centralUser = \App\Models\Landlord\CentralUser::where('email', $email)
+            ->where('is_active', true)
+            ->first();
+
+        // Security: Ensure user belongs to the current department
+        $currentTenant = app(\Spatie\Multitenancy\Models\Tenant::class)::current();
+        
+        if (!$centralUser || !Hash::check($password, $centralUser->password) || ($currentTenant && $centralUser->tenant_id != $currentTenant->id)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -50,6 +56,24 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // 2. Resolve to Department Profile (Tenant DB) via Anonymized Hash
+        $emailHash = hash('sha256', $email);
+        $tenantUser = \App\Models\User::where('email_hash', $emailHash)->first();
+
+        if (!$tenantUser) {
+            // Profile missing in this department
+            throw ValidationException::withMessages([
+                'email' => 'This account exists in the system but is not registered for this department.',
+            ]);
+        }
+
+        if (!$tenantUser->is_active) {
+             throw ValidationException::withMessages([
+                'email' => 'This account has been deactivated by the department administrator.',
+            ]);
+        }
+
+        Auth::login($tenantUser, $this->boolean('remember'));
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -4,9 +4,15 @@ namespace App\Http\Controllers\Landlord;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
+use App\Models\Landlord\CentralUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class TenantController extends Controller
 {
@@ -50,16 +56,26 @@ class TenantController extends Controller
 
         $tenant = Tenant::create($validated);
 
-        // Run migrations for the new tenant
-        $tenant->makeCurrent();
-        \Illuminate\Support\Facades\Artisan::call('migrate --database=mysql --path=database/migrations/tenant --force');
-
-        // Create the first Admin user in the Tenant Database
-        \App\Models\User::create([
+        // 1. Create Identity in Central Hub (Landlord DB)
+        CentralUser::create([
             'tenant_id' => $tenant->id,
             'name' => $validated['admin_name'],
             'email' => $validated['admin_email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($validated['admin_password']),
+            'password' => Hash::make($validated['admin_password']),
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        // 2. Create Profile in Department (Tenant DB) - ANONYMIZED
+        $tenant->makeCurrent();
+        Artisan::call('migrate --database=mysql --path=database/migrations/tenant --force');
+
+        \App\Models\User::create([
+            'tenant_id' => $tenant->id,
+            'name' => $validated['admin_name'],
+            'email' => '[ANONYMIZED]', // Redact real email
+            'email_hash' => hash('sha256', $validated['admin_email']),
+            'password' => Hash::make(Str::random(32)), // Decoy password
             'role' => 'admin',
             'is_active' => true,
         ]);
@@ -75,6 +91,7 @@ class TenantController extends Controller
 
     public function update(Request $request, Tenant $tenant)
     {
+        // 1. Validate Tenant Metadata
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:tenants,slug,' . $tenant->id,
@@ -83,7 +100,63 @@ class TenantController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
+        // 2. Validate Admin Provisioning if any field is filled
+        if ($request->anyFilled(['admin_name', 'admin_email', 'admin_password'])) {
+            $request->validate([
+                'admin_name' => 'required|string|max:255',
+                'admin_email' => 'required|string|email|max:255',
+                'admin_password' => 'required|string|min:8',
+            ]);
+        }
+
         $tenant->update($validated);
+
+        // Provision additional admin if all fields are filled
+        if ($request->filled(['admin_name', 'admin_email', 'admin_password'])) {
+            try {
+                // 1. Create Identity in Central Hub
+                CentralUser::updateOrCreate(
+                    ['email' => $request->admin_email, 'tenant_id' => $tenant->id],
+                    [
+                        'name' => $request->admin_name,
+                        'password' => Hash::make($request->admin_password),
+                        'role' => 'admin',
+                        'is_active' => true,
+                    ]
+                );
+
+                // 2. Create Anonymized Profile in Department
+                $tenant->makeCurrent();
+
+                $emailHash = hash('sha256', $request->admin_email);
+                
+                \App\Models\User::updateOrCreate(
+                    ['email_hash' => $emailHash],
+                    [
+                        'tenant_id' => $tenant->id,
+                        'name' => $request->admin_name,
+                        'email' => '[ANONYMIZED]',
+                        'password' => Hash::make(Str::random(32)), // Decoy
+                        'role' => 'admin',
+                        'is_active' => true,
+                    ]
+                );
+
+                // Send welcome email
+                try {
+                    Mail::to($request->admin_email)
+                        ->send(new \App\Mail\TenantWelcomeEmail($tenant, $request->admin_password, $request->admin_name, $request->admin_email));
+                } catch (\Exception $e) {
+                    // Log mail failure but don't block user creation
+                }
+
+                $tenant->forget();
+
+                return redirect()->back()->with('success', 'Department updated and new administrator provisioned successfully through Central Identity Hub.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Failed to provision admin: ' . $e->getMessage())->withInput();
+            }
+        }
 
         return redirect()->back()->with('success', 'Department updated successfully.');
     }

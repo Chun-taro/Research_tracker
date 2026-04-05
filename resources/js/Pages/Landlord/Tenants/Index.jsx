@@ -14,15 +14,15 @@ function TenantModal({ tenant, onClose }) {
         is_active: tenant?.is_active ?? true,
         admin_name: '',
         admin_email: '',
-        admin_password: 'password',
+        admin_password: tenant ? '' : 'password',
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (tenant) {
-            router.patch(`/landlord/tenants/${tenant.id}`, data, { onSuccess: onClose });
+            patch(route('landlord.tenants.update', tenant.id), { onSuccess: onClose });
         } else {
-            router.post('/landlord/tenants', data, { onSuccess: onClose });
+            post(route('landlord.tenants.store'), { onSuccess: onClose });
         }
     };
 
@@ -73,34 +73,35 @@ function TenantModal({ tenant, onClose }) {
                         <p className="text-[10px] text-slate-400 mt-1">If blank, defaults to [slug].localhost</p>
                     </div>
 
-                    {!tenant && (
-                        <div className="pt-4 border-t border-slate-100 mt-4 space-y-4">
-                            <h3 className="text-sm font-bold text-slate-900 border-l-4 border-indigo-500 pl-3">Initial Admin Account</h3>
+                    <div className="pt-4 border-t border-slate-100 mt-4 space-y-4">
+                        <h3 className="text-sm font-bold text-slate-900 border-l-4 border-indigo-500 pl-3">
+                            {tenant ? 'Provision Additional Admin' : 'Initial Admin Account'}
+                        </h3>
+                        {tenant && <p className="text-[10px] text-slate-500 italic">Optional: Only fill these if you need to create a new administrator for this department.</p>}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Admin Name</label>
+                            <input type="text" value={data.admin_name} onChange={e => setData('admin_name', e.target.value)}
+                                placeholder="e.g. Dr. John Smith"
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
+                            {errors.admin_name && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_name}</p>}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Name</label>
-                                <input type="text" value={data.admin_name} onChange={e => setData('admin_name', e.target.value)}
-                                    placeholder="e.g. Dr. John Smith"
-                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required />
-                                {errors.admin_name && <p className="text-xs text-red-500 mt-1">{errors.admin_name}</p>}
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Email</label>
+                                <input type="email" value={data.admin_email} onChange={e => setData('admin_email', e.target.value)}
+                                    placeholder="admin@dept.edu.ph"
+                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
+                                {errors.admin_email && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_email}</p>}
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Admin Email</label>
-                                    <input type="email" value={data.admin_email} onChange={e => setData('admin_email', e.target.value)}
-                                        placeholder="admin@dept.edu.ph"
-                                        className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required />
-                                    {errors.admin_email && <p className="text-xs text-red-500 mt-1">{errors.admin_email}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Admin Password</label>
-                                    <input type="password" value={data.admin_password} onChange={e => setData('admin_password', e.target.value)}
-                                        placeholder="••••••••"
-                                        className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required />
-                                    {errors.admin_password && <p className="text-xs text-red-500 mt-1">{errors.admin_password}</p>}
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Password</label>
+                                <input type="password" value={data.admin_password} onChange={e => setData('admin_password', e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
+                                {errors.admin_password && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_password}</p>}
                             </div>
                         </div>
-                    )}
+                    </div>
 
                     {tenant && (
                         <div className="flex items-center gap-2 pt-2">

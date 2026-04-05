@@ -14,8 +14,8 @@ use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Landing page
-Route::get('/', function () {
+// Landing page - check if active if tenant is detected
+Route::middleware(['tenant.active'])->get('/', function () {
     if (app()->bound('currentTenant') && app('currentTenant')) {
         return Inertia::render('TenantWelcome');
     }
@@ -23,7 +23,7 @@ Route::get('/', function () {
 });
 
 // Authenticated + Tenant routes
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
 
     // Dashboard - redirects based on role
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -79,12 +79,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('billing', [\App\Http\Controllers\TenantSubscriptionController::class, 'index'])->name('billing.index');
         Route::post('billing/checkout', [\App\Http\Controllers\TenantSubscriptionController::class, 'checkout'])->name('billing.checkout');
         Route::get('billing/success', [\App\Http\Controllers\TenantSubscriptionController::class, 'success'])->name('billing.success');
-        Route::get('billing/cancel', [\App\Http\Controllers\TenantSubscriptionController::class, 'cancel'])->name('billing.cancel');
+
+        // System Updates
+        Route::post('system/update', [\App\Http\Controllers\Admin\SystemUpdateController::class, 'update'])->name('system.update');
     });
 
     // ------- LANDLORD (CENTRAL SYSTEM) ROUTES -------
     Route::middleware(['landlord'])->prefix('landlord')->name('landlord.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/updates/run-migrations', [\App\Http\Controllers\Landlord\DashboardController::class, 'updateTenants'])->name('updates.run-migrations');
+        Route::post('/updates/rollback-migrations', [\App\Http\Controllers\Landlord\DashboardController::class, 'rollbackTenants'])->name('updates.rollback-migrations');
         Route::resource('tenants', \App\Http\Controllers\Landlord\TenantController::class);
         Route::post('tenants/{tenant}/mock-subscription', [\App\Http\Controllers\Landlord\TenantController::class, 'mockSubscription'])->name('tenants.mock-subscription');
         Route::get('subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');

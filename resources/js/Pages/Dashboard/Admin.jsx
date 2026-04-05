@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, useForm } from '@inertiajs/react';
 import { StatsCard } from '@/Components/StatsCard';
 import { StatusBadge } from '@/Components/StatusBadge';
 import { PageHeader } from '@/Components/PageHeader';
@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react';
 
 export default function AdminDashboard({ stats, statusDistribution, upcomingDeadlines, recentGroups }) {
     const { tenant } = usePage().props;
+    const { post, processing } = useForm();
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -50,6 +51,30 @@ export default function AdminDashboard({ stats, statusDistribution, upcomingDead
                 title={`${tenant?.name ?? 'Department'} Dashboard`}
                 subtitle="Overview of research activities"
             />
+
+            {/* System Update Notification */}
+            {tenant?.is_update_available && (
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-pulse">
+                    <div className="flex items-center gap-3 text-amber-800 dark:text-amber-400">
+                        <AlertCircle className="shrink-0" size={24} />
+                        <div>
+                            <p className="font-bold text-sm">System Update Available!</p>
+                            <p className="text-xs">Your department database is out of date (Running: {tenant.version} | Latest: {tenant.system_version})</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            if (confirm(`Are you sure you want to update the department database to version ${tenant.system_version}? This will synchronize your department features with the central system.`)) {
+                                post(route('admin.system.update'));
+                            }
+                        }}
+                        disabled={processing}
+                        className="w-full sm:w-auto px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-bold transition-colors disabled:opacity-50 shadow-md"
+                    >
+                        {processing ? 'Synchronizing...' : 'Update Department Now'}
+                    </button>
+                </div>
+            )}
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
