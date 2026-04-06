@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class EnsureTenantIsActive
 {
@@ -15,7 +17,19 @@ class EnsureTenantIsActive
         // Only block if a tenant is identified but is inactive.
         // If no tenant is found, we assume we are on the landlord domain or a route that doesn't require a tenant.
         if ($tenant && !$tenant->is_active) {
-            abort(403, 'This department account is inactive or not found. Please contact the system administrator.');
+            return \Inertia\Inertia::render('Errors/Inactive', [
+                'message' => 'This department account is inactive. Please contact the system administrator to reactivate your workspace.',
+                'type' => 'tenant'
+            ]);
+        }
+
+        // Check if user is inactive (for logged in users)
+        if ($request->user() && !$request->user()->is_active) {
+            Auth::logout();
+            return Inertia::render('Errors/Inactive', [
+                'message' => 'Your personal account has been deactivated by the department administrator. Please contact your supervisor for details.',
+                'type' => 'user'
+            ]);
         }
 
         if ($tenant) {

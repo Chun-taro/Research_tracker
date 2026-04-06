@@ -41,6 +41,7 @@ class RegisteredUserController extends Controller
             'tenant_id' => app()->bound('currentTenant') ? app('currentTenant')->id : null,
             'name' => $request->name,
             'email' => $request->email,
+            'email_hash' => hash('sha256', $request->email),
             'password' => Hash::make($request->password),
             'role' => 'student',
             'is_active' => true,

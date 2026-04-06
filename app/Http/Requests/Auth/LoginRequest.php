@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -48,17 +49,23 @@ class LoginRequest extends FormRequest
         // Security: Ensure user belongs to the current department
         $currentTenant = app(\Spatie\Multitenancy\Models\Tenant::class)::current();
         
-        if (!$centralUser || !Hash::check($password, $centralUser->password) || ($currentTenant && $centralUser->tenant_id != $currentTenant->id)) {
+        if (!$centralUser || !Hash::check($password, $centralUser->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
+        
+        // Tenant scope check
+        if ($currentTenant && $centralUser->tenant_id != $currentTenant->id) {
+             throw ValidationException::withMessages([
+                'email' => 'This account does not have access to this department.',
+            ]);
+        }
 
-        // 2. Resolve to Department Profile (Tenant DB) via Anonymized Hash
-        $emailHash = hash('sha256', $email);
-        $tenantUser = \App\Models\User::where('email_hash', $emailHash)->first();
+        // 2. Resolve to Department Profile (Tenant DB) via Plain Email
+        $tenantUser = \App\Models\User::where('email', $email)->first();
 
         if (!$tenantUser) {
             // Profile missing in this department

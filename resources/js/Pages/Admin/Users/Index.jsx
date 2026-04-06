@@ -13,6 +13,7 @@ function UserModal({ user, onClose, onSubmit }) {
         phone: user?.phone ?? '',
         password: '',
         password_confirmation: '',
+        randomize_password: true,
     });
 
     const handleSubmit = (e) => {
@@ -61,17 +62,26 @@ function UserModal({ user, onClose, onSubmit }) {
                     </div>
                     {!user && (
                         <>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                                <input type="password" value={data.password} onChange={e => setData('password', e.target.value)}
-                                    className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
-                                {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+                            <div className="flex items-center gap-2 mb-2">
+                                <input id="randomize" type="checkbox" checked={data.randomize_password} onChange={e => setData('randomize_password', e.target.checked)} className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                <label htmlFor="randomize" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer select-none">Send credentials via email (Auto-generate password)</label>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
-                                <input type="password" value={data.password_confirmation} onChange={e => setData('password_confirmation', e.target.value)}
-                                    className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
-                            </div>
+                            
+                            {!data.randomize_password && (
+                                <div className="space-y-4 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Set Password</label>
+                                        <input type="password" value={data.password} onChange={e => setData('password', e.target.value)}
+                                            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="Minimal 8 chars" />
+                                        {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                                        <input type="password" value={data.password_confirmation} onChange={e => setData('password_confirmation', e.target.value)}
+                                            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
+                                    </div>
+                                </div>
+                            )}
                         </>
                     )}
                     <div className="flex justify-end gap-3 pt-2">
@@ -148,7 +158,9 @@ export default function UsersIndex({ users, filters }) {
                                             <span className="font-medium text-gray-900 dark:text-white">{user.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">{user.email}</td>
+                                    <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">
+                                        {user.email || <span className="italic text-gray-400 opacity-50">Email Hidden</span>}
+                                    </td>
                                     <td className="px-5 py-3.5">
                                         <StatusBadge status={user.role} />
                                     </td>

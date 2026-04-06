@@ -80,7 +80,13 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::post('billing/checkout', [\App\Http\Controllers\TenantSubscriptionController::class, 'checkout'])->name('billing.checkout');
         Route::get('billing/success', [\App\Http\Controllers\TenantSubscriptionController::class, 'success'])->name('billing.success');
 
-        // System Updates
+        // System Updates & Support
+        Route::get('system/updates', function () {
+            return Inertia::render('Admin/System/Updates', [
+                'system_version' => config('app.version', 'v1.4.2'),
+            ]);
+        })->name('system.updates');
+
         Route::post('system/update', [\App\Http\Controllers\Admin\SystemUpdateController::class, 'update'])->name('system.update');
     });
 
