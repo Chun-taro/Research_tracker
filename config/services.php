@@ -40,4 +40,10 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'github' => [
+        'owner' => 'Chun-taro',
+        'repo' => 'Research_tracker',
+        'branch' => 'main',
+    ],
+
 ];

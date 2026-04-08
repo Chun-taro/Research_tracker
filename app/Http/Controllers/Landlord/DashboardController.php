@@ -11,10 +11,13 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+use App\Services\SystemUpdateService;
+
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(SystemUpdateService $updateService)
     {
+        $updateStatus = $updateService->checkUpdate();
         $stats = [
             'total_tenants' => Tenant::count(),
             'active_tenants' => Tenant::where('is_active', true)->count(),
@@ -40,6 +43,14 @@ class DashboardController extends Controller
             'recentTenants' => $recent_tenants,
             'revenueByMonth' => $revenue_by_month,
             'tierDistribution' => $tier_distribution,
+        ]);
+    }
+
+    public function systemHistory(SystemUpdateService $updateService)
+    {
+        return Inertia::render('Landlord/SystemHistory', [
+            'updateStatus' => $updateService->checkUpdate(),
+            'fullHistory' => $updateService->getHistory(30), // Get more items for the dedicated page
         ]);
     }
 }

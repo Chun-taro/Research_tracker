@@ -16,7 +16,8 @@ export default function LandlordLayout({ children }) {
         { label: 'Central Dashboard', href: '/landlord/dashboard', icon: LayoutDashboard },
         { label: 'Tenants', href: '/landlord/tenants', icon: Users },
         { label: 'Subscription Plans', href: '/landlord/plans', icon: CreditCard },
-        { label: 'Revenue & Tracking', href: '/landlord/subscriptions', icon: History },
+        { label: 'Revenue & Tracking', href: '/landlord/subscriptions', icon: CreditCard },
+        { label: 'System History', href: '/landlord/system-history', icon: History },
     ];
 
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';

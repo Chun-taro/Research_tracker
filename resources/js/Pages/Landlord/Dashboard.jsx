@@ -7,7 +7,7 @@ import { Globe, Users, CreditCard, ShoppingBag, TrendingUp } from 'lucide-react'
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export default function LandlordDashboard({ stats, recentTenants, tierDistribution }) {
+export default function LandlordDashboard({ stats, recentTenants, tierDistribution, updateStatus }) {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -104,10 +104,73 @@ export default function LandlordDashboard({ stats, recentTenants, tierDistributi
                         <canvas ref={chartRef}></canvas>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t border-slate-100">
-                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">System Health</h4>
-                            <p className="text-sm font-medium text-slate-600 italic">All systems operational</p>
+                    <div className="mt-6 pt-6 border-t border-slate-100 flex-1 overflow-hidden">
+                         <div className={cn("p-4 rounded-xl border transition-all duration-300 h-full flex flex-col", 
+                            updateStatus?.update_available 
+                                ? "bg-amber-50 border-amber-200 shadow-sm shadow-amber-500/10" 
+                                : "bg-slate-50 border-slate-100"
+                         )}>
+                            <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">System Update History</h4>
+                                {updateStatus?.update_available && (
+                                    <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-cog"></span>
+                                )}
+                            </div>
+                            
+                            {/* Current Status Highlights */}
+                            <div className="mb-4 pb-4 border-b border-slate-200">
+                                {updateStatus?.update_available ? (
+                                    <div>
+                                        <p className="text-sm font-bold text-amber-900 leading-tight">Update Available</p>
+                                        <p className="text-[11px] text-amber-700 mt-1 line-clamp-2 italic font-medium">"{updateStatus.latest_message}"</p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="text-sm font-bold text-slate-700 leading-tight">System Up to Date</p>
+                                        <p className="text-[11px] text-slate-400 mt-1">Current: <span className="font-mono">{updateStatus?.current_hash}</span></p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Commit History List */}
+                            <div className="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-thin scrollbar-thumb-slate-200">
+                                {updateStatus?.history?.map((commit) => (
+                                    <a 
+                                        key={commit.sha} 
+                                        href={commit.url} 
+                                        target="_blank" 
+                                        className={cn(
+                                            "block p-2 rounded-lg border transition-all group",
+                                            commit.is_current 
+                                                ? "bg-white border-blue-200 ring-2 ring-blue-500/10" 
+                                                : "bg-white/50 border-transparent hover:border-slate-200"
+                                        )}
+                                    >
+                                        <div className="flex justify-between items-start mb-1">
+                                            <span className={cn(
+                                                "text-[9px] font-mono px-1.5 py-0.5 rounded",
+                                                commit.is_current ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-500"
+                                            )}>
+                                                {commit.sha}
+                                            </span>
+                                            {commit.is_current && (
+                                                <span className="text-[8px] font-bold text-blue-600 uppercase tracking-tighter">Current</span>
+                                            )}
+                                        </div>
+                                        <p className="text-[11px] font-medium text-slate-700 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                            {commit.message}
+                                        </p>
+                                        <div className="mt-1 flex justify-between items-center text-[9px] text-slate-400 font-medium">
+                                            <span>{commit.author}</span>
+                                            <span>{new Date(commit.date).toLocaleDateString()}</span>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+
+                            <a href={updateStatus?.repo_url} target="_blank" className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-center gap-1.5 text-[10px] font-bold text-slate-500 hover:text-indigo-600 transition-colors uppercase tracking-widest">
+                                Full GitHub History <TrendingUp size={10} />
+                            </a>
                          </div>
                     </div>
                 </div>

@@ -101,6 +101,9 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
 
         // Revenue & Subscriptions Monitoring
         Route::get('/subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');
+
+        // System History
+        Route::get('/system-history', [\App\Http\Controllers\Landlord\DashboardController::class, 'systemHistory'])->name('system-history');
     });
 
     // ------- ADVISER ROUTES -------
