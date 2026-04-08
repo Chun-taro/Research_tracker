@@ -26,12 +26,8 @@ class TenantSubscriptionController extends Controller
         $subscription = Subscription::on('landlord')->where('tenant_id', $tenantId)->latest()->first();
         $payments = Payment::on('landlord')->with('subscription')->where('tenant_id', $tenantId)->latest()->take(5)->get();
 
-        // Pass available plans
-        $plans = [
-            'basic' => ['name' => 'Basic Plan', 'price' => 1000],
-            'standard' => ['name' => 'Standard Plan', 'price' => 2500],
-            'premium' => ['name' => 'Premium Plan', 'price' => 4000],
-        ];
+        // Pass available plans from database
+        $plans = \App\Models\Landlord\SubscriptionTier::where('is_active', true)->orderBy('price')->get();
 
         return Inertia::render('Admin/Billing', [
             'tenant' => $tenant,
@@ -44,28 +40,30 @@ class TenantSubscriptionController extends Controller
     public function checkout(Request $request)
     {
         $request->validate([
-            'tier' => 'required|string|in:basic,standard,premium',
+            'tier' => 'required|string',
         ]);
 
         $tier = $request->tier;
-        $prices = [
-            'basic' => 1000,
-            'standard' => 2500,
-            'premium' => 4000,
-        ];
-        $priceInCents = $prices[$tier] * 100;
+        $plan = \App\Models\Landlord\SubscriptionTier::where('slug', $tier)->first();
+        
+        if (!$plan) {
+            return redirect()->back()->with('error', 'Invalid subscription tier selected.');
+        }
+
+        $priceInCents = $plan->price * 100;
         $tenantId = app()->bound('currentTenant') ? app('currentTenant')->id : null;
         if (!$tenantId) { abort(403); }
 
         $secret = config('services.stripe.secret');
+        $isMockMode = !$secret || $secret === 'sk_test_dummy' || app()->environment('local');
 
-        if ($secret === 'sk_test_dummy') {
-            // Bypass Stripe for local testing with dummy keys
+        if ($isMockMode) {
+            // Bypass Stripe for local testing
             return redirect()->route('admin.billing.success', [
-                'session_id' => 'dummy_session_' . rand(1000, 9999),
+                'session_id' => 'mock_session_' . uniqid(),
                 'mock_tenant_id' => $tenantId,
                 'mock_tier' => $tier,
-                'mock_amount' => $prices[$tier]
+                'mock_amount' => $plan->price,
             ]);
         }
 
@@ -90,7 +88,7 @@ class TenantSubscriptionController extends Controller
             'metadata' => [
                 'tenant_id' => $tenantId,
                 'tier' => $tier,
-                'amount' => $prices[$tier],
+                'amount' => $plan->price,
             ],
         ]);
 
@@ -106,12 +104,13 @@ class TenantSubscriptionController extends Controller
         }
 
         $secret = config('services.stripe.secret');
+        $isMockSession = str_starts_with($sessionId, 'mock_session_') || str_starts_with($sessionId, 'dummy_session_');
 
-        if ($secret === 'sk_test_dummy' && str_starts_with($sessionId, 'dummy_session_')) {
+        if ($isMockSession) {
             $tenantId = $request->get('mock_tenant_id');
             $tier = $request->get('mock_tier');
             $amount = $request->get('mock_amount');
-            $paymentIntent = 'pi_mock_' . rand(10000, 99999);
+            $paymentIntent = 'pi_mock_' . uniqid();
         } else {
             Stripe::setApiKey($secret);
             $session = StripeSession::retrieve($sessionId);

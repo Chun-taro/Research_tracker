@@ -81,7 +81,7 @@ export default function AdviserGroups({ groups }) {
                          <Users size={64} className="mx-auto text-gray-100 dark:text-gray-800 mb-6" />
                          <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Groups Assigned</h4>
                          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm">
-                            You're not currently listed as an adviser for any research groups. Once the department admin assigns you, they will appear here.
+                            You're not currently listed as an adviser for any research groups. Once the portal admin assigns you, they will appear here.
                          </p>
                     </div>
                 )}

@@ -27,6 +27,7 @@ class TenantController extends Controller
 
         return Inertia::render('Landlord/Tenants/Index', [
             'tenants' => $query->latest()->paginate(10),
+            'plans' => \App\Models\Landlord\SubscriptionTier::where('is_active', true)->get(),
             'filters' => $request->only('search'),
         ]);
     }
@@ -35,9 +36,10 @@ class TenantController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'institution_name' => 'nullable|string|max:255',
             'slug' => 'required|string|max:255|unique:tenants,slug',
             'domain' => 'nullable|string|max:255|unique:tenants,domain',
-            'subscription_tier' => 'required|string|in:basic,standard,premium',
+            'subscription_tier' => 'required|string|exists:landlord.subscription_tiers,slug',
             'theme_color' => 'nullable|string|max:7',
             'admin_name' => 'required|string|max:255',
             'admin_email' => 'required|string|email|max:255',
@@ -56,26 +58,16 @@ class TenantController extends Controller
 
         $tenant = Tenant::create($validated);
 
-        // 1. Create Identity in Central Hub (Landlord DB)
-        CentralUser::create([
-            'tenant_id' => $tenant->id,
-            'name' => $validated['admin_name'],
-            'email' => $validated['admin_email'],
-            'password' => Hash::make($validated['admin_password']),
-            'role' => 'admin',
-            'is_active' => true,
-        ]);
-
-        // 2. Create Profile in Department (Tenant DB) - ANONYMIZED
+        // 2. Create Profile in Department (Tenant DB)
         $tenant->makeCurrent();
         Artisan::call('migrate --database=mysql --path=database/migrations/tenant --force');
 
         \App\Models\User::create([
             'tenant_id' => $tenant->id,
             'name' => $validated['admin_name'],
-            'email' => '[ANONYMIZED]', // Redact real email
+            'email' => $validated['admin_email'],
             'email_hash' => hash('sha256', $validated['admin_email']),
-            'password' => Hash::make(Str::random(32)), // Decoy password
+            'password' => Hash::make($validated['admin_password']),
             'role' => 'admin',
             'is_active' => true,
         ]);
@@ -86,7 +78,7 @@ class TenantController extends Controller
         \Illuminate\Support\Facades\Mail::to($validated['admin_email'])
             ->send(new \App\Mail\TenantWelcomeEmail($tenant, $validated['admin_password'], $validated['admin_name'], $validated['admin_email']));
 
-        return redirect()->back()->with('success', 'Department created and database provisioned successfully.');
+        return redirect()->back()->with('success', 'Tenant created and database provisioned successfully.');
     }
 
     public function update(Request $request, Tenant $tenant)
@@ -94,9 +86,10 @@ class TenantController extends Controller
         // 1. Validate Tenant Metadata
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'institution_name' => 'nullable|string|max:255',
             'slug' => 'required|string|max:255|unique:tenants,slug,' . $tenant->id,
             'domain' => 'nullable|string|max:255|unique:tenants,domain,' . $tenant->id,
-            'subscription_tier' => 'required|string|in:basic,standard,premium',
+            'subscription_tier' => 'required|string|exists:landlord.subscription_tiers,slug',
             'is_active' => 'required|boolean',
         ]);
 
@@ -114,29 +107,19 @@ class TenantController extends Controller
         // Provision additional admin if all fields are filled
         if ($request->filled(['admin_name', 'admin_email', 'admin_password'])) {
             try {
-                // 1. Create Identity in Central Hub
-                CentralUser::updateOrCreate(
-                    ['email' => $request->admin_email, 'tenant_id' => $tenant->id],
-                    [
-                        'name' => $request->admin_name,
-                        'password' => Hash::make($request->admin_password),
-                        'role' => 'admin',
-                        'is_active' => true,
-                    ]
-                );
-
-                // 2. Create Anonymized Profile in Department
+                // 2. Create Profile in Department
                 $tenant->makeCurrent();
 
                 $emailHash = hash('sha256', $request->admin_email);
                 
                 \App\Models\User::updateOrCreate(
-                    ['email_hash' => $emailHash],
+                    ['email' => $request->admin_email],
                     [
                         'tenant_id' => $tenant->id,
                         'name' => $request->admin_name,
-                        'email' => '[ANONYMIZED]',
-                        'password' => Hash::make(Str::random(32)), // Decoy
+                        'email' => $request->admin_email,
+                        'email_hash' => $emailHash,
+                        'password' => Hash::make($request->admin_password),
                         'role' => 'admin',
                         'is_active' => true,
                     ]
@@ -152,25 +135,24 @@ class TenantController extends Controller
 
                 $tenant->forget();
 
-                return redirect()->back()->with('success', 'Department updated and new administrator provisioned successfully through Central Identity Hub.');
+                return redirect()->back()->with('success', 'Tenant updated and new administrator provisioned successfully through Central Identity Hub.');
             } catch (\Exception $e) {
                 return redirect()->back()->with('error', 'Failed to provision admin: ' . $e->getMessage())->withInput();
             }
         }
 
-        return redirect()->back()->with('success', 'Department updated successfully.');
+        return redirect()->back()->with('success', 'Tenant updated successfully.');
     }
 
     public function mockSubscription(Request $request, Tenant $tenant)
     {
         $tier = $request->get('tier', 'premium');
-        $prices = [
-            'basic' => 1000.00,
-            'standard' => 2500.00,
-            'premium' => 4000.00,
-        ];
+        $plan = \App\Models\Landlord\SubscriptionTier::where('slug', $tier)->first();
+        if (!$plan) {
+            return redirect()->back()->with('error', 'Invalid subscription tier selected.');
+        }
 
-        $amount = $prices[$tier] ?? 4000.00;
+        $amount = $plan->price;
         $expiresAt = now()->addYear(); // Standard subscription is 1 year
 
         \Illuminate\Support\Facades\DB::connection('landlord')->transaction(function () use ($tenant, $tier, $amount, $expiresAt) {
@@ -206,6 +188,6 @@ class TenantController extends Controller
     public function destroy(Tenant $tenant)
     {
         $tenant->delete();
-        return redirect()->back()->with('success', 'Department archived successfully.');
+        return redirect()->back()->with('success', 'Tenant archived successfully.');
     }
 }

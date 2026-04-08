@@ -1,6 +1,6 @@
 # Research Tracker (Multi-Tenant Architecture)
 
-This is a comprehensive multi-tenant research tracking application rebuilt with Laravel 12, Inertia.js, and React. It features a central Landlord system to manage isolated Department (Tenant) databases, handles multi-role workflows (Student, Adviser, Panelist, Admin), and includes automated subscription billing via Stripe.
+This is a comprehensive multi-tenant research tracking application rebuilt with Laravel 12, Inertia.js, and React. It features a central Landlord system to manage isolated Tenant (Portal) databases, handles multi-role workflows (Student, Adviser, Panelist, Admin), and includes automated subscription billing via Stripe.
 
 ## 📋 Prerequisites
 
@@ -95,10 +95,10 @@ Everything is driven by subdomains. Because `SESSION_DOMAIN=.localhost` is set, 
 - **URL**: `http://localhost:8000` (or `http://admin.localhost:8000`)
 - **Login Credentials**: Check `database/seeders/DatabaseSeeder.php` for the default landlord admin account created during seeding.
 
-### Department Portals (Tenants)
-If you created a department named `bsit`, the system will automatically provision its database. 
+### Institution Portals (Tenants)
+If you created a portal named `bsit`, the system will automatically provision its database. 
 - **URL**: `http://bsit.localhost:8000`
-- **Login Credentials**: Use the initial Admin Password you set in the Landlord dashboard when creating the department.
+- **Login Credentials**: Use the initial Admin Password you set in the Landlord dashboard when creating the portal.
 
 ---
 

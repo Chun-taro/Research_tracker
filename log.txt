@@ -1,0 +1,20 @@
+
+  Dropping all tables  295.87ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table  21.93ms DONE
+
+   INFO  Running migrations.  
+
+  0000_00_00_000000_create_tenants_table  385.21ms DONE
+  0001_01_01_000000_create_users_table  162.01ms DONE
+  0001_01_01_000001_create_cache_table  85.16ms DONE
+  0001_01_01_000002_create_jobs_table  102.67ms DONE
+  2026_03_31_143500_create_permission_tables  498.60ms DONE
+  2026_03_31_143501_create_activity_log_table  85.37ms DONE
+  2026_03_31_143502_add_event_column_to_activity_log_table  12.39ms DONE
+  2026_03_31_143503_add_batch_uuid_column_to_activity_log_table  79.52ms DONE
+  2026_04_05_140000_create_system_update_logs_table  21.75ms DONE
+  2026_04_05_150000_add_version_to_tenants_table  14.54ms DONE
+

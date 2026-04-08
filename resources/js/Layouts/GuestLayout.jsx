@@ -12,7 +12,7 @@ export default function Guest({ children }) {
                         </div>
                     </Link>
                     <h2 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white tracking-tight">ResearchTracker</h2>
-                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Department Management System</p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Tenant Management System</p>
                 </div>
 
                 {children}

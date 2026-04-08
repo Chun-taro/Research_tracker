@@ -37,15 +37,15 @@ class HandleInertiaRequests extends Middleware
                     'tenant_id' => $user->tenant_id,
                 ] : null,
             ],
-            'tenant' => $tenant ? [
+            'tenant' => $tenant ? array_merge([
                 'id' => $tenant->id,
                 'name' => $tenant->name,
                 'slug' => $tenant->slug,
                 'logo_path' => $tenant->logo_path,
                 'theme_color' => $tenant->theme_color,
                 'subscription_tier' => $tenant->subscription_tier,
-            ] : null,
-            'context' => $request->is('landlord*') ? 'landlord' : 'department',
+            ], \App\Models\Landlord\SubscriptionTier::where('slug', $tenant->subscription_tier)->first()?->only(['features', 'limits']) ?? []) : null,
+            'context' => $request->is('landlord*') ? 'landlord' : 'portal',
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

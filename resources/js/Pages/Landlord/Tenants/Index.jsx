@@ -5,9 +5,10 @@ import { Plus, Search, Edit2, Trash2, X, Globe, ExternalLink, Settings, Zap } fr
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
-function TenantModal({ tenant, onClose }) {
+function TenantModal({ tenant, plans, onClose }) {
     const { data, setData, post, patch, processing, errors } = useForm({
         name: tenant?.name ?? '',
+        institution_name: tenant?.institution_name ?? '',
         slug: tenant?.slug ?? '',
         domain: tenant?.domain ?? '',
         subscription_tier: tenant?.subscription_tier ?? 'basic',
@@ -30,16 +31,23 @@ function TenantModal({ tenant, onClose }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                    <h2 className="text-lg font-semibold text-slate-900">{tenant ? 'Edit Department' : 'Configure New Department'}</h2>
+                    <h2 className="text-lg font-semibold text-slate-900">{tenant ? 'Edit Tenant' : 'Configure New Tenant'}</h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={20} /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Department Name</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Tenant Name (e.g. BSIT)</label>
                         <input type="text" value={data.name} onChange={e => setData('name', e.target.value)}
                             placeholder="e.g. BS Information Technology"
                             className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-slate-50 outline-none" required />
                         {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">School / University / Institution</label>
+                        <input type="text" value={data.institution_name} onChange={e => setData('institution_name', e.target.value)}
+                            placeholder="e.g. University of the Philippines"
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-slate-50 outline-none" />
+                        {errors.institution_name && <p className="text-xs text-red-500 mt-1">{errors.institution_name}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -48,17 +56,17 @@ function TenantModal({ tenant, onClose }) {
                                     const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
                                     setData(d => ({ ...d, slug, admin_email: `admin@${slug}.localhost` }));
                                 }}
-                                placeholder="e.g. bsit"
+                                placeholder="e.g. acme"
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-slate-50 outline-none" required />
                              {errors.slug && <p className="text-xs text-red-500 mt-1">{errors.slug}</p>}
                         </div>
-                        <div>
+                        <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-1">Subscription Tier</label>
                             <select value={data.subscription_tier} onChange={e => setData('subscription_tier', e.target.value)}
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-slate-50 outline-none">
-                                <option value="basic">Basic Plan</option>
-                                <option value="standard">Standard Plan</option>
-                                <option value="premium">Premium Plan</option>
+                                {plans?.map(plan => (
+                                    <option key={plan.id} value={plan.slug}>{plan.name} (${plan.price})</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -77,7 +85,7 @@ function TenantModal({ tenant, onClose }) {
                         <h3 className="text-sm font-bold text-slate-900 border-l-4 border-indigo-500 pl-3">
                             {tenant ? 'Provision Additional Admin' : 'Initial Admin Account'}
                         </h3>
-                        {tenant && <p className="text-[10px] text-slate-500 italic">Optional: Only fill these if you need to create a new administrator for this department.</p>}
+                        {tenant && <p className="text-[10px] text-slate-500 italic">Optional: Only fill these if you need to create a new administrator for this tenant.</p>}
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Admin Name</label>
                             <input type="text" value={data.admin_name} onChange={e => setData('admin_name', e.target.value)}
@@ -113,7 +121,7 @@ function TenantModal({ tenant, onClose }) {
                     <div className="flex justify-end gap-3 pt-4">
                         <button type="button" onClick={onClose} className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
                         <button type="submit" disabled={processing} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200 disabled:opacity-50">
-                            {processing ? 'Processing...' : (tenant ? 'Update Account' : 'Initialize Department')}
+                            {processing ? 'Processing...' : (tenant ? 'Update Account' : 'Initialize Tenant')}
                         </button>
                     </div>
                 </form>
@@ -122,7 +130,7 @@ function TenantModal({ tenant, onClose }) {
     );
 }
 
-export default function TenantIndex({ tenants, filters }) {
+export default function TenantIndex({ tenants, plans, filters }) {
     const [modal, setModal] = useState(null);
     const [search, setSearch] = useState(filters?.search ?? '');
 
@@ -132,11 +140,11 @@ export default function TenantIndex({ tenants, filters }) {
 
     return (
         <LandlordLayout>
-            <Head title="Department Management" />
-            <PageHeader title="Department Management" subtitle="Create and monitor research department accounts"
+            <Head title="Tenant Management" />
+            <PageHeader title="Tenant Management" subtitle="Create and monitor tenant accounts"
                 actions={
                     <button onClick={() => setModal('create')} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200">
-                        <Plus size={16} /> New Department
+                        <Plus size={16} /> New Tenant
                     </button>
                 }
             />
@@ -144,7 +152,7 @@ export default function TenantIndex({ tenants, filters }) {
             <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 mb-6 shadow-sm">
                 <Search size={18} className="text-slate-400" />
                 <input value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && applySearch()}
-                    placeholder="Search by department name or subdomain slug..."
+                    placeholder="Search by tenant name or subdomain slug..."
                     className="flex-1 text-sm bg-transparent outline-none text-slate-900 placeholder:text-slate-400" />
                 <button onClick={applySearch} className="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-600 transition-colors">Apply</button>
             </div>
@@ -181,6 +189,9 @@ export default function TenantIndex({ tenants, filters }) {
                                 </div>
                             </div>
                             <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">{tenant.name}</h3>
+                            {tenant.institution_name && (
+                                <p className="text-xs font-semibold text-slate-500 mb-3 truncate">@ {tenant.institution_name}</p>
+                            )}
                             <div className="flex items-center gap-2 mb-4">
                                 <span className={cn('px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider', 
                                     tenant.subscription_tier === 'premium' ? 'bg-amber-100 text-amber-700' : 
@@ -209,7 +220,8 @@ export default function TenantIndex({ tenants, filters }) {
                 ))}
             </div>
 
-            {modal && <TenantModal tenant={modal === 'create' ? null : modal} onClose={() => setModal(null)} />}
+            {modal === 'create' && <TenantModal plans={plans} onClose={() => setModal(null)} />}
+            {modal && typeof modal === 'object' && <TenantModal plans={plans} tenant={modal} onClose={() => setModal(null)} />}
         </LandlordLayout>
     );
 }

@@ -59,11 +59,11 @@ export default function TenantWelcome({ auth, tenant }) {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div className="text-left">
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6" style={{ backgroundColor: `${themeColor}15`, color: themeColor }}>
-                                <Layers size={14} /> Department Core
+                                <Layers size={14} /> Global Core
                             </div>
                             <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[1.1]">
                                 Accelerate Your <br/>
-                                <span style={{ color: themeColor }}>Departmental</span> Research.
+                                <span style={{ color: themeColor }}>Strategic</span> Research.
                             </h1>
                             <p className="text-lg text-slate-500 mb-10 leading-relaxed font-medium max-w-xl">
                                 Welcome to the official research management platform for the <strong>{tenant?.name}</strong>. Submit proposals, track cycles, and coordinate with advisers in one unified space.

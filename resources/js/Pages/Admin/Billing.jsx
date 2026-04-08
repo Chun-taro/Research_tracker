@@ -21,7 +21,7 @@ export default function Billing({ tenant, subscription, payments, plans }) {
     return (
         <AuthenticatedLayout>
             <Head title="Billing & Subscription" />
-            <PageHeader title="Billing & Subscription" subtitle="Manage your department's platform access and billing" />
+            <PageHeader title="Billing & Subscription" subtitle="Manage your portal's platform access and billing" />
 
             {/* Current Plan Card */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-10">
@@ -63,87 +63,83 @@ export default function Billing({ tenant, subscription, payments, plans }) {
             <div className="mb-12">
                 <div className="text-center max-w-2xl mx-auto mb-10">
                     <h3 className="text-3xl font-black text-slate-900 mb-3">Upgrade Your Plan</h3>
-                    <p className="text-slate-500 font-medium">Select a plan that fits your department's research volume and feature requirements. Subscriptions are billed annually.</p>
+                    <p className="text-slate-500 font-medium">Select a plan that fits your portal's research volume and feature requirements. Subscriptions are billed annually.</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Basic Plan */}
-                    <div className={cn("bg-white rounded-3xl border-2 p-8 transition-all relative overflow-hidden", tenant.subscription_tier === 'basic' ? 'border-emerald-600 shadow-xl shadow-emerald-200/50' : 'border-slate-100 shadow-sm hover:border-emerald-300')}>
-                        {tenant.subscription_tier === 'basic' && <div className="absolute top-0 right-0 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl">Current Plan</div>}
-                        <div className="h-12 w-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6"><Shield size={24} /></div>
-                        <h4 className="text-xl font-bold text-slate-900 mb-2">Basic</h4>
-                        <div className="flex items-baseline gap-1 mb-6">
-                            <span className="text-4xl font-black text-slate-900">₱{(plans.basic.price).toLocaleString()}</span>
-                            <span className="text-slate-500 text-sm font-medium">/ year</span>
-                        </div>
-                        <ul className="space-y-4 mb-8 text-sm text-slate-600">
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> Up to 5 Active Research Groups</li>
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> Standard Thesis Workflows</li>
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-green-500 shrink-0" /> 5GB Document Storage</li>
-                        </ul>
-                        <button 
-                            onClick={() => handleCheckout('basic')} 
-                            disabled={submitting === 'basic'}
-                            className={cn("w-full py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50", 
-                                tenant.subscription_tier === 'basic' ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                            )}
-                        >
-                            {submitting === 'basic' ? 'Processing...' : (tenant.subscription_tier === 'basic' ? 'Renew Basic Plan' : 'Downgrade to Basic')}
-                        </button>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {plans.map((plan, index) => {
+                        const isCurrent = tenant.subscription_tier === plan.slug;
+                        const isPopular = plan.slug === 'premium' || index === plans.length - 1;
 
-                    {/* Standard Plan */}
-                    <div className={cn("bg-white rounded-3xl border-2 p-8 transition-all relative overflow-hidden", tenant.subscription_tier === 'standard' ? 'border-indigo-600 shadow-xl shadow-indigo-200/50' : 'border-slate-100 shadow-sm hover:border-indigo-300')}>
-                        {tenant.subscription_tier === 'standard' && <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl">Current Plan</div>}
-                        <div className="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-6"><Zap size={24} /></div>
-                        <h4 className="text-xl font-bold text-slate-900 mb-2">Standard</h4>
-                        <div className="flex items-baseline gap-1 mb-6">
-                            <span className="text-4xl font-black text-slate-900">₱{(plans.standard.price).toLocaleString()}</span>
-                            <span className="text-slate-500 text-sm font-medium">/ year</span>
-                        </div>
-                        <ul className="space-y-4 mb-8 text-sm text-slate-600">
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-indigo-500 shrink-0" /> Up to 20 Active Research Groups</li>
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-blue-500 shrink-0" /> Advanced Scheduling Tools</li>
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-blue-500 shrink-0" /> 20GB Document Storage</li>
-                            <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-blue-500 shrink-0" /> Priority Email Support</li>
-                        </ul>
-                        <button 
-                            onClick={() => handleCheckout('standard')} 
-                            disabled={submitting === 'standard'}
-                            className={cn("w-full py-3.5 rounded-xl font-bold text-sm transition-all disabled:opacity-50", 
-                                tenant.subscription_tier === 'standard' ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200' : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-                            )}
-                        >
-                            {submitting === 'standard' ? 'Processing...' : (tenant.subscription_tier === 'standard' ? 'Renew Standard Plan' : 'Select Standard')}
-                        </button>
-                    </div>
+                        return (
+                            <div key={plan.id} className={cn(
+                                "rounded-3xl border-2 p-8 transition-all relative overflow-hidden flex flex-col justify-between",
+                                isPopular ? "bg-slate-950 text-white border-amber-500 shadow-2xl shadow-amber-500/20" : "bg-white text-slate-900 border-slate-100 hover:border-indigo-300 shadow-sm",
+                                isCurrent && (isPopular ? "ring-4 ring-amber-500/30" : "ring-4 ring-indigo-500/30 border-indigo-500")
+                            )}>
+                                {isCurrent && (
+                                    <div className={cn("absolute top-0 right-0 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-bl-xl shadow-sm z-20", 
+                                        isPopular ? "bg-amber-500 text-white" : "bg-indigo-600 text-white"
+                                    )}>
+                                        Active Plan
+                                    </div>
+                                )}
+                                
+                                <div className="relative z-10">
+                                    <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center mb-6", 
+                                        isPopular ? "bg-amber-500/20 text-amber-400 border border-amber-500/20" : "bg-indigo-50 text-indigo-600 border border-indigo-100"
+                                    )}>
+                                        {index === 0 ? <Shield size={24} /> : index === 1 ? <Zap size={24} /> : <CreditCard size={24} />}
+                                    </div>
 
-                    {/* Premium Plan */}
-                    <div className={cn("bg-slate-900 rounded-3xl border-2 p-8 transition-all relative overflow-hidden text-white", tenant.subscription_tier === 'premium' ? 'border-amber-500 shadow-2xl shadow-amber-500/30' : 'border-slate-800 hover:border-amber-400')}>
-                        {tenant.subscription_tier === 'premium' && <div className="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl">Current Plan</div>}
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none"></div>
-                        <div className="relative z-10">
-                            <div className="h-12 w-12 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center mb-6 border border-amber-500/20"><CreditCard size={24} /></div>
-                            <h4 className="text-xl font-bold text-white mb-2">Premium <span className="ml-2 text-[10px] bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">Most Popular</span></h4>
-                            <div className="flex items-baseline gap-1 mb-6">
-                                <span className="text-4xl font-black text-white">₱{(plans.premium.price).toLocaleString()}</span>
-                                <span className="text-slate-400 text-sm font-medium">/ year</span>
+                                    <h4 className={cn("text-xl font-black mb-2 flex items-center gap-2", isPopular ? "text-white" : "text-slate-900")}>
+                                        {plan.name}
+                                        {isPopular && <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md uppercase tracking-wider font-bold border border-amber-500/20">Pro</span>}
+                                    </h4>
+
+                                    <div className="flex items-baseline gap-1 mb-6">
+                                        <span className={cn("text-4xl font-black", isPopular ? "text-white" : "text-slate-900")}>
+                                            ₱{parseFloat(plan.price).toLocaleString()}
+                                        </span>
+                                        <span className={cn("text-xs font-bold uppercase tracking-widest", isPopular ? "text-slate-400" : "text-slate-400")}>
+                                            / {plan.billing_cycle}
+                                        </span>
+                                    </div>
+
+                                    <ul className="space-y-4 mb-10">
+                                        {plan.features?.map((feature, fIndex) => (
+                                            <li key={fIndex} className="flex items-start gap-3 text-sm font-medium">
+                                                <div className={cn("mt-0.5 shrink-0", isPopular ? "text-amber-400" : "text-indigo-500")}>
+                                                    <CheckCircle2 size={16} />
+                                                </div>
+                                                <span className={isPopular ? "text-slate-300" : "text-slate-600"}>{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <button 
+                                    onClick={() => handleCheckout(plan.slug)} 
+                                    disabled={submitting === plan.slug}
+                                    className={cn(
+                                        "relative z-10 w-full py-4 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] disabled:opacity-50",
+                                        isCurrent 
+                                            ? (isPopular ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100")
+                                            : (isPopular ? "bg-amber-500 text-white hover:bg-amber-600 shadow-xl shadow-amber-500/30" : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-500/20")
+                                    )}
+                                >
+                                    {submitting === plan.slug ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                            Processing...
+                                        </span>
+                                    ) : (
+                                        isCurrent ? `Renew ${plan.name}` : `Upgrade to ${plan.name}`
+                                    )}
+                                </button>
                             </div>
-                            <ul className="space-y-4 mb-8 text-sm text-slate-300">
-                                <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-amber-400 shrink-0" /> Unlimited Research Groups</li>
-                                <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-amber-400 shrink-0" /> Full API Access & Integrations</li>
-                                <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-amber-400 shrink-0" /> 100GB Document Storage</li>
-                                <li className="flex items-center gap-3"><CheckCircle2 size={16} className="text-amber-400 shrink-0" /> 24/7 Dedicated Support</li>
-                            </ul>
-                            <button 
-                                onClick={() => handleCheckout('premium')} 
-                                disabled={submitting === 'premium'}
-                                className="w-full py-3.5 rounded-xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-lg shadow-amber-500/30 disabled:opacity-50"
-                            >
-                                {submitting === 'premium' ? 'Processing...' : (tenant.subscription_tier === 'premium' ? 'Renew Premium Plan' : 'Upgrade to Premium')}
-                            </button>
-                        </div>
-                    </div>
+                        );
+                    })}
                 </div>
             </div>
 

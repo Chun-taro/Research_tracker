@@ -68,7 +68,7 @@ export default function PanelistAssignments({ groups }) {
                          </div>
                          <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Active Assignments</h4>
                          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm leading-relaxed">
-                            You're not currently assigned to any research panel. Department administrators will notify you once a group is assigned for your review.
+                            You're not currently assigned to any research panel. Portal administrators will notify you once a group is assigned for your review.
                          </p>
                          <div className="mt-10 px-8 py-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Assignment Dashboard</p>

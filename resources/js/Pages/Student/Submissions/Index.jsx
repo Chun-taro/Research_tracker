@@ -82,7 +82,7 @@ export default function StudentSubmissions({ submissions, group }) {
                                 <button onClick={() => router.get(`/student/submissions/${sub.id}`)} className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl hover:text-blue-600 transition-colors">
                                     <MessageSquare size={18} />
                                 </button>
-                                <a href={sub.latest_version?.file_path} className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl hover:text-blue-600 transition-colors">
+                                 <a href={sub.file_path} className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl hover:text-blue-600 transition-colors">
                                     <FileDown size={18} />
                                 </a>
                             </div>
@@ -102,7 +102,7 @@ export default function StudentSubmissions({ submissions, group }) {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="px-8 py-6 border-b border-gray-50 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
-                            <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-wider">New Submission</h2>
+                            <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-wider">Submit Document</h2>
                             <button onClick={() => setUploading(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                                 <X size={24} />
                             </button>
@@ -134,9 +134,9 @@ export default function StudentSubmissions({ submissions, group }) {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Change Notes (Reason for submission)</label>
-                                <textarea value={form.data.change_notes} onChange={e => form.setData('change_notes', e.target.value)}
-                                    placeholder="Briefly describe what's in this version..." rows={3}
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Remarks (Optional)</label>
+                                <textarea value={form.data.remarks} onChange={e => form.setData('remarks', e.target.value)}
+                                    placeholder="Enter any additional notes..." rows={3}
                                     className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
                             </div>
 

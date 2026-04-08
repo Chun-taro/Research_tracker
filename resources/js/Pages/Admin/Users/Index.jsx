@@ -19,9 +19,19 @@ function UserModal({ user, onClose, onSubmit }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (user) {
-            router.patch(`/admin/users/${user.id}`, data, { onSuccess: onClose });
+            put(`/admin/users/${user.id}`, {
+                onSuccess: () => {
+                    reset();
+                    onClose();
+                }
+            });
         } else {
-            router.post('/admin/users', data, { onSuccess: onClose });
+            post('/admin/users', {
+                onSuccess: () => {
+                    reset();
+                    onClose();
+                }
+            });
         }
     };
 
@@ -110,7 +120,7 @@ export default function UsersIndex({ users, filters }) {
             <Head title="User Management" />
             <PageHeader
                 title="User Management"
-                subtitle={`${users?.total ?? 0} users in this department`}
+                subtitle={`${users?.total ?? 0} users in this portal`}
                 actions={
                     <button onClick={() => setModal('create')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
                         <Plus size={16} /> Add User

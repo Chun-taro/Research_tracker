@@ -22,10 +22,11 @@ class EnsureLandlord
         }
 
         // Must NOT be in a tenant context (must be on the main domain/central system)
-        if (app()->bound('currentTenant') && app('currentTenant') !== null) {
-            // If they are a superadmin but tried to access a tenant URL, we might want to allow 
-            // but usually landlord dashboard is root domain only.
-            // For now, let's just ensure they are on the central system for landlord routes.
+        $host = $request->getHost();
+        $landlordDomains = config('multitenancy.landlord_domains', ['localhost', '127.0.0.1']);
+
+        if (!in_array($host, $landlordDomains)) {
+            abort(403, 'Unauthorized. The central management portal must be accessed through the main domain.');
         }
 
         return $next($request);

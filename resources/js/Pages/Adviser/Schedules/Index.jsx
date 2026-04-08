@@ -65,7 +65,7 @@ export default function AdviserSchedules({ schedules }) {
                             You don't have any upcoming defense sessions or consultations scheduled for your监督 groups.
                          </p>
                          <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold ring-1 ring-blue-100 dark:ring-blue-900/30">
-                             Contact Department Admin for scheduling
+                             Contact Portal Admin for scheduling
                          </div>
                     </div>
                 )}

@@ -10,6 +10,7 @@ class Tenant extends BaseTenant
 
     protected $fillable = [
         'name',
+        'institution_name',
         'slug',
         'domain',
         'custom_domain',

@@ -1,0 +1,8 @@
+Users in LANDLORD database (research_tracker):
+- Email: superadmin@researchtracker.com | Role: superadmin | Tenant ID: 
+- Email: michaelangeloangeles0@gmail.com | Role: admin | Tenant ID: 1
+
+Tenants available:
+- ID: 1 | Name: Bachelor in Science Information Technology | DB: research_tracker_bsit
+  Users in research_tracker_bsit:
+    * Email: [ANONYMIZED] | Hash: 80cc8e7c8c482f84118b07554004cd1cf9bab5d17fca0295e566504482f25e5c

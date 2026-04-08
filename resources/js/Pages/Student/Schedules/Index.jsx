@@ -77,7 +77,7 @@ export default function StudentSchedules({ schedules, group }) {
                          <Calendar size={64} className="mx-auto text-gray-100 dark:text-gray-800 mb-6 group-hover:scale-110 transition-transform duration-500" />
                          <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Scheduled Sessions</h4>
                          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto text-sm leading-relaxed">
-                            Your adviser or department admin hasn't scheduled any defense or consultation sessions for your group yet.
+                            Your adviser or portal admin hasn't scheduled any defense or consultation sessions for your group yet.
                          </p>
                          <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold">
                             <Info size={14} /> Check back later for updates

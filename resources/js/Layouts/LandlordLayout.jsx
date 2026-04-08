@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import {
-    LayoutDashboard, Globe, CreditCard, Settings, Bell, 
-    ChevronLeft, ChevronRight, LogOut, Shield, Menu, X
+    ChevronLeft, ChevronRight, LogOut, Shield, Menu, X, Users, History, 
+    LayoutDashboard, CreditCard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function LandlordLayout({ children }) {
-    const { auth, context } = usePage().props;
+    const { auth, context, url } = usePage().props;
     const user = auth?.user;
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const navItems = [
         { label: 'Central Dashboard', href: '/landlord/dashboard', icon: LayoutDashboard },
-        { label: 'Departments', href: '/landlord/tenants', icon: Globe },
-        { label: 'Subscriptions', href: '/landlord/subscriptions', icon: CreditCard },
+        { label: 'Tenants', href: '/landlord/tenants', icon: Users },
+        { label: 'Subscription Plans', href: '/landlord/plans', icon: CreditCard },
+        { label: 'Revenue & Tracking', href: '/landlord/subscriptions', icon: History },
     ];
 
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';

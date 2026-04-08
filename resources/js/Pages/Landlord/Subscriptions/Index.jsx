@@ -43,14 +43,14 @@ export default function SubscriptionIndex({ subscriptions, payments, revenue_tot
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-slate-100">
                         <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                            <CreditCard size={18} className="text-slate-400" /> Active Departmental Plans
+                            <CreditCard size={18} className="text-slate-400" /> Active Tenant Plans
                         </h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="bg-slate-50/50 text-left">
-                                    <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Department</th>
+                                    <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Tenant</th>
                                     <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Tier</th>
                                     <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Expires At</th>
                                 </tr>

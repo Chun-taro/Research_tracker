@@ -3,7 +3,7 @@
 
 Hi {{ $adminName }},
 
-Your department, **{{ $tenant->name }}**, has been successfully provisioned on the central platform. 
+Your institution's research portal, **{{ $tenant->name }}**, has been successfully provisioned on our central platform. 
 
 You can now log in to your dedicated portal using the initial credentials below:
 

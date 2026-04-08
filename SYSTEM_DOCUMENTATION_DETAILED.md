@@ -8,7 +8,7 @@
 The Academic Research Tracker is a comprehensive Multi-Tenant SaaS solution designed to bridge the gap between student researchers, faculty advisers, and institutional administration.
 
 **Details**:
-Traditional research management often relies on fragmented email threads, paper trails, and unorganized cloud storage. This system centralizes the **Research Lifecycle**, providing institutional departments with a white-labeled dashboard to:
+Traditional research management often relies on fragmented email threads, paper trails, and unorganized cloud storage. This system centralizes the **Research Lifecycle**, providing institution-wide research portals with a white-labeled dashboard to:
 - Standardize thesis and dissertation workflows.
 - Enforce strict document versioning and audit trails.
 - Monitor student progress against institutional deadlines.
@@ -22,27 +22,27 @@ A cloud-ready, enterprise-grade platform for academic research oversight.
 
 **Details**:
 The platform utilizes a **Multi-Database Tenancy 모델**, which is the gold standard for security in SaaS. 
-- **Central Application (SaaS Core)**: Handles global administration, department onboarding, system-wide health monitoring, and enterprise billing.
-- **Tenant Application (Client Instance)**: Provides a private database and customized UI for each department (e.g., "College of Engineering", "Dept. of Computer Science").
+- **Central Application (SaaS Core)**: Handles global administration, portal onboarding, system-wide health monitoring, and enterprise billing.
+- **Tenant Application (Client Instance)**: Provides a private database and customized UI for each research portal (e.g., "Main Campus", "Graduate School").
 
 ---
 
 ## 3. Objectives
 ### Primary Objectives:
-- **Standardization**: Create a uniform research submission process across all university departments.
+- **Standardization**: Create a uniform research submission process across all institution portals.
 - **Integrity**: Implement a "no-deletion" versioning policy where all previous drafts are preserved.
-- **Scalability**: Support hundreds of departments on a single codebase with effortless onboarding.
+- **Scalability**: Support hundreds of portals on a single codebase with effortless onboarding.
 
 ### Secondary Objectives:
 - **Automation**: Automatic status updates and deadline alerts for students and advisers.
-- **Visibility**: Provide real-time progress reports for department heads.
+- **Visibility**: Provide real-time progress reports for portal administrators.
 - **Repository Health**: Built-in archiving for long-term storage of final manuscripts.
 
 ---
 
 ## 4. Scope and Limitations
 ### Scope:
-- **Institutional Onboarding**: Automated database provisioning for new department signups.
+- **Institutional Onboarding**: Automated database provisioning for new portal signups.
 - **Subscription Cycles**: Annual billing with automated plan restrictions.
 - **Research Lifecycle Management**:
     - Title Proposal & Approval
@@ -75,7 +75,7 @@ The platform utilizes a **Multi-Database Tenancy 모델**, which is the gold sta
 
 ## 6. Multi-Tenancy Design
 ### Isolation Strategy:
-The platform implements **Physical Database Isolation**. When a new department is initialized:
+The platform implements **Physical Database Isolation**. When a new portal is initialized:
 - A new MySQL database is created (e.g., `tenant_bsit`).
 - Migrations are run specifically on that database.
 - Files are stored in tenant-specific directories: `storage/app/submissions/{tenant_id}/`.
@@ -88,7 +88,7 @@ This architecture prevents **Cross-Tenant Data Leakage**, meeting strict privacy
 ### Landlord (Central) Schema:
 | Table Name | Primary Purpose |
 | :--- | :--- |
-| `tenants` | Metadata for departments (subdomain, db name, theme). |
+| `tenants` | Metadata for portals (subdomain, db name, theme). |
 | `subscriptions` | Active plans, expiry dates. |
 | `payments` | Transaction logs and reference numbers. |
 | `users` | SuperAdmin accounts for global platform oversight. |
@@ -96,7 +96,7 @@ This architecture prevents **Cross-Tenant Data Leakage**, meeting strict privacy
 ### Tenant (Local) Schema:
 | Table Name | Primary Purpose |
 | :--- | :--- |
-| `users` | Students, Advisers, and Panelists belonging to that department. |
+| `users` | Students, Advisers, and Panelists belonging to that portal. |
 | `research_groups` | Student clusters and their assigned advisers. |
 | `submissions` | The core "Research Work" record. |
 | `submission_versions` | The physical files and history of changes. |
@@ -119,8 +119,8 @@ The system uses a **Copy-Forward** mechanism.
 ## 9. User Roles and Permissions (RBAC)
 | Role | Key Capabilities |
 | :--- | :--- |
-| **SuperAdmin** | Onboard departments, set global plan limits, manage revenue. |
-| **Dept. Admin** | Manage department users, set research cycles/deadlines. |
+| **SuperAdmin** | Onboard portals, set global plan limits, manage revenue. |
+| **Portal Admin** | Manage portal users, set research cycles/deadlines. |
 | **Adviser** | Monitor assigned groups, provide "Revision Required" status. |
 | **Panelist** | Review final defense manuscripts, provide final approval scores. |
 | **Student** | Form groups, submit documents, track status and version history. |
@@ -146,7 +146,7 @@ The system uses a **Copy-Forward** mechanism.
 ## 12. Core API Documentation
 | Method | Endpoint | Data / Action |
 | :--- | :--- | :--- |
-| `POST` | `/admin/tenants` | Create new department instance. |
+| `POST` | `/admin/tenants` | Create new portal instance. |
 | `PATCH` | `/admin/submissions/{sub}` | Update submission status (Approve/Reject). |
 | `POST` | `/admin/submissions/{sub}/revert/{ver}` | Restore previous document version. |
 | `GET` | `/landlord/subscriptions` | System-wide revenue reporting. |
@@ -156,7 +156,7 @@ The system uses a **Copy-Forward** mechanism.
 ## 13. System Screenshots (Development View)
 1. **Dynamic Dashboard**: Shows student distribution across research statuses (Pie chart).
 2. **Billing Central**: Premium dark-mode themed billing dashboard for administrators.
-3. **Tenant management**: The central hub for creating and monitoring departmental accounts.
+3. **Tenant Management**: The central hub for creating and monitoring portal accounts.
 
 ---
 

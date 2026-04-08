@@ -15,6 +15,14 @@ use Spatie\Multitenancy\Models\Tenant;
 
 return [
     /*
+     * These domains are considered part of the landlord (central) system.
+     */
+    'landlord_domains' => [
+        'localhost',
+        '127.0.0.1',
+    ],
+
+    /*
      * This class is responsible for determining which tenant should be current
      * for the given request.
      *

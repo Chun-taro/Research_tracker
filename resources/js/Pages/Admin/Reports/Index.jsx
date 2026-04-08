@@ -50,7 +50,7 @@ export default function ReportsIndex({ stats, statusDistribution, submissionTren
             <Head title="Reports & Analytics" />
             <PageHeader
                 title="Reports & Analytics"
-                subtitle="Department research statistics and trends"
+                subtitle="Tenant research statistics and trends"
                 actions={
                     <div className="flex gap-2">
                         <a href="/admin/reports/csv" className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">

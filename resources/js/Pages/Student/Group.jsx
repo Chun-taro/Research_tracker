@@ -84,7 +84,7 @@ export default function StudentGroup({ group, memberRole, availableCycles }) {
                                         </>
                                     ) : (
                                         <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl">
-                                            <p className="text-xs text-amber-700 dark:text-amber-400 font-bold">No active research cycles found. Please contact the department administrator.</p>
+                                            <p className="text-xs text-amber-700 dark:text-amber-400 font-bold">No active research cycles found. Please contact the portal administrator.</p>
                                         </div>
                                     )}
                                 </div>

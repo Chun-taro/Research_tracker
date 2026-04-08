@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { BookOpen, Shield, BarChart2, Users, FileText, CheckCircle, ArrowRight, Building2, Globe, Database } from 'lucide-react';
+import { BookOpen, Shield, BarChart2, Users, FileText, CheckCircle, ArrowRight, Building2, Globe, Database, Layers } from 'lucide-react';
 
 export default function Welcome({ auth }) {
     const themeColor = '#4F46E5'; // Indigo-600 for corporate feel
@@ -14,11 +14,11 @@ export default function Welcome({ auth }) {
                     <div className="flex justify-between h-20 items-center">
                         <div className="flex items-center gap-2">
                             <div className="h-10 w-10 rounded shadow-indigo-100 shadow-lg flex items-center justify-center text-white" style={{ backgroundColor: themeColor }}>
-                                <Shield size={24} />
+                                <Layers size={20} />
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-black text-xl tracking-tighter text-gray-900 leading-none">RESEARCH TRACKER</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Institutional Console</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Tenant Console</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-6">
@@ -51,13 +51,13 @@ export default function Welcome({ auth }) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center max-w-4xl mx-auto">
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full text-indigo-600 text-xs font-bold uppercase tracking-widest mb-8">
-                            <Globe size={14} /> The Multi-Tenant Standard for Higher Ed
+                            <Globe size={14} /> The Multi-Tenant Standard for Governance
                         </div>
                         <h1 className="text-6xl lg:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[0.95]">
-                            Manage Research Across Your <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-slate-900">Entire Institution.</span>
+                            Manage Research Across Your <span className="text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-slate-900">Entire Organization.</span>
                         </h1>
                         <p className="text-xl text-slate-500 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
-                            A centralized command center for universities and colleges to provision department portals, track institutional KPIs, and automate research governance.
+                            A centralized command center for organizations and institutions to provision portal accounts, track KPIs, and automate research governance.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
@@ -81,15 +81,15 @@ export default function Welcome({ auth }) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div>
-                        <h2 className="text-4xl font-black text-slate-900 mb-6 leading-tight">Built for Institutional <br/>Scale & Security</h2>
+                        <h2 className="text-4xl font-black text-slate-900 mb-6 leading-tight">Built for Enterprise <br/>Scale & Security</h2>
                         <p className="text-lg text-slate-500 mb-10 leading-relaxed font-medium">
-                            Empower individual departments with isolated databases and custom branding while maintaining global oversight and standards from a central dashboard.
+                            Empower individual tenants with isolated databases and custom branding while maintaining global oversight and standards from a central dashboard.
                         </p>
                         <ul className="space-y-6">
                             {[
-                                { title: 'Isolated Multi-Tenancy', icon: Database, desc: 'Every department gets its own secure database instance.' },
-                                { title: 'Global Reporting', icon: BarChart2, desc: 'Aggregated analytics across all departmental research activities.' },
-                                { title: 'Centralized Billing', icon: Building2, desc: 'Manage subscriptions and quotas for your entire campus.' },
+                                { title: 'Isolated Multi-Tenancy', icon: Database, desc: 'Every tenant gets its own secure database instance.' },
+                                { title: 'Global Reporting', icon: BarChart2, desc: 'Aggregated analytics across all tenant research activities.' },
+                                { title: 'Centralized Billing', icon: Building2, desc: 'Manage subscriptions and quotas for your entire portal.' },
                             ].map((item, i) => (
                                 <li key={i} className="flex gap-4">
                                     <div className="h-12 w-12 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
@@ -109,7 +109,7 @@ export default function Welcome({ auth }) {
                             </div>
                             <div className="absolute -bottom-10 -right-10 bg-indigo-600 p-8 rounded-2xl shadow-2xl text-white max-w-[240px]">
                                 <span className="block text-4xl font-black mb-2">99.9%</span>
-                                <span className="text-xs font-bold uppercase tracking-widest opacity-80">Institutional uptime ensured by global architecture.</span>
+                                <span className="text-xs font-bold uppercase tracking-widest opacity-80">Enterprise uptime ensured by global architecture.</span>
                             </div>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ export default function Welcome({ auth }) {
                             <span className="font-black text-2xl tracking-tighter uppercase">Research Tracker</span>
                         </div>
                         <div className="text-center md:text-right text-slate-500 font-bold text-xs uppercase tracking-[0.2em]">
-                            © {new Date().getFullYear()} Central Institutional Management Platform. <br/>All Rights Reserved.
+                            © {new Date().getFullYear()} Central Governance Platform. <br/>All Rights Reserved.
                         </div>
                     </div>
                 </div>

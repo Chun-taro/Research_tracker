@@ -13,7 +13,7 @@ Log In Now
 > [!IMPORTANT]
 > For security reasons, please change your password immediately after your first login.
 
-If you did not expect this email, please contact your department administrator.
+If you did not expect this email, please contact your portal administrator.
 
 Thanks,<br>
 {{ config('app.name') }}

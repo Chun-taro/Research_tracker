@@ -79,25 +79,28 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::get('billing', [\App\Http\Controllers\TenantSubscriptionController::class, 'index'])->name('billing.index');
         Route::post('billing/checkout', [\App\Http\Controllers\TenantSubscriptionController::class, 'checkout'])->name('billing.checkout');
         Route::get('billing/success', [\App\Http\Controllers\TenantSubscriptionController::class, 'success'])->name('billing.success');
-
-        // System Updates & Support
-        Route::get('system/updates', function () {
-            return Inertia::render('Admin/System/Updates', [
-                'system_version' => config('app.version', 'v1.4.2'),
-            ]);
-        })->name('system.updates');
-
-        Route::post('system/update', [\App\Http\Controllers\Admin\SystemUpdateController::class, 'update'])->name('system.update');
+        Route::get('billing/cancel', [\App\Http\Controllers\TenantSubscriptionController::class, 'cancel'])->name('billing.cancel');
     });
 
     // ------- LANDLORD (CENTRAL SYSTEM) ROUTES -------
     Route::middleware(['landlord'])->prefix('landlord')->name('landlord.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
-        Route::post('/updates/run-migrations', [\App\Http\Controllers\Landlord\DashboardController::class, 'updateTenants'])->name('updates.run-migrations');
-        Route::post('/updates/rollback-migrations', [\App\Http\Controllers\Landlord\DashboardController::class, 'rollbackTenants'])->name('updates.rollback-migrations');
-        Route::resource('tenants', \App\Http\Controllers\Landlord\TenantController::class);
-        Route::post('tenants/{tenant}/mock-subscription', [\App\Http\Controllers\Landlord\TenantController::class, 'mockSubscription'])->name('tenants.mock-subscription');
-        Route::get('subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');
+        
+        // Tenant Management
+        Route::get('/tenants', [App\Http\Controllers\Landlord\TenantController::class, 'index'])->name('landlord.tenants');
+        Route::post('/tenants', [App\Http\Controllers\Landlord\TenantController::class, 'store']);
+        Route::patch('/tenants/{tenant}', [App\Http\Controllers\Landlord\TenantController::class, 'update'])->name('tenants.update');
+        Route::delete('/tenants/{tenant}', [App\Http\Controllers\Landlord\TenantController::class, 'destroy'])->name('tenants.destroy');
+        Route::post('/tenants/{tenant}/subscription', [App\Http\Controllers\Landlord\TenantController::class, 'mockSubscription'])->name('tenants.mock-subscription');
+
+        // Subscription Plans Management
+        Route::get('/plans', [App\Http\Controllers\Landlord\SubscriptionTierController::class, 'index'])->name('plans.index');
+        Route::post('/plans', [App\Http\Controllers\Landlord\SubscriptionTierController::class, 'store'])->name('plans.store');
+        Route::patch('/plans/{plan}', [App\Http\Controllers\Landlord\SubscriptionTierController::class, 'update'])->name('plans.update');
+        Route::delete('/plans/{plan}', [App\Http\Controllers\Landlord\SubscriptionTierController::class, 'destroy'])->name('plans.destroy');
+
+        // Revenue & Subscriptions Monitoring
+        Route::get('/subscriptions', [\App\Http\Controllers\Landlord\SubscriptionController::class, 'index'])->name('subscriptions.index');
     });
 
     // ------- ADVISER ROUTES -------

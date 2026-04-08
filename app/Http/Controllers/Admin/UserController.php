@@ -51,31 +51,20 @@ class UserController extends Controller
         $plainPassword = $request->filled('password') ? $request->password : Str::random(12);
         $hashedPassword = Hash::make($plainPassword);
 
-        // 1. Create/Update Central User (SSO Hub)
-        $centralUser = CentralUser::updateOrCreate(
-            ['email' => $request->email],
-            [
-                'name' => $data['name'],
-                'password' => $hashedPassword,
-                'role' => $data['role'],
-                'tenant_id' => $tenant->id,
-                'is_active' => true,
-            ]
-        );
-
         // 2. Create Tenant Profile
         $user = User::create([
             'tenant_id' => $tenant->id,
             'name' => $data['name'],
             'email' => $request->email,
-            'email_hash' => hash('sha256', $request->email), // Keep hash for legacy if needed, but primary is email
+            'email_hash' => hash('sha256', $request->email),
+            'password' => $hashedPassword,
             'role' => $data['role'],
             'phone' => $data['phone'] ?? null,
             'is_active' => true,
         ]);
 
         // 3. Send Welcome Email
-        Mail::to($request->email)->send(new WelcomeUser($centralUser, $plainPassword));
+        Mail::to($request->email)->send(new WelcomeUser($user, $plainPassword));
 
         return back()->with('success', 'User created successfully and credentials emailed.');
     }
@@ -90,13 +79,6 @@ class UserController extends Controller
         ]);
 
         $user->update($data);
-
-        // Also update CentralUser if found
-        CentralUser::where('email', $user->getOriginal('email'))->update([
-            'email' => $data['email'],
-            'name' => $data['name'],
-            'role' => $data['role'],
-        ]);
 
         return back()->with('success', 'User updated successfully.');
     }

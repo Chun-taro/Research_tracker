@@ -7,6 +7,7 @@ import { useState } from 'react';
 export default function SettingsIndex({ tenant }) {
     const [data, setData] = useState({
         name: tenant?.name ?? '',
+        institution_name: tenant?.institution_name ?? '',
         theme_color: tenant?.theme_color ?? '#3B82F6',
         contact_email: tenant?.contact_email ?? '',
         contact_phone: tenant?.contact_phone ?? '',
@@ -31,7 +32,7 @@ export default function SettingsIndex({ tenant }) {
     return (
         <AuthenticatedLayout>
             <Head title="Settings" />
-            <PageHeader title="Department Settings" subtitle="Customize your department profile" />
+            <PageHeader title="Tenant Settings" subtitle="Customize your tenant profile" />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Settings Form */}
@@ -39,8 +40,13 @@ export default function SettingsIndex({ tenant }) {
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-5">General Settings</h3>
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department Name</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tenant Name (e.g. BSIT)</label>
                             <input type="text" value={data.name} onChange={e => setData(p => ({ ...p, name: e.target.value }))} required
+                                className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Institution / School (e.g. University of the East)</label>
+                            <input type="text" value={data.institution_name} onChange={e => setData(p => ({ ...p, institution_name: e.target.value }))}
                                 className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none" />
                         </div>
                         <div>
@@ -65,7 +71,7 @@ export default function SettingsIndex({ tenant }) {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Department Logo</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tenant Logo</label>
                             <input type="file" onChange={e => setLogo(e.target.files[0])} accept="image/*"
                                 className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition-colors cursor-pointer" />
                         </div>
@@ -83,31 +89,12 @@ export default function SettingsIndex({ tenant }) {
                         <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Subscription Plan</h3>
                         <StatusBadge status={tenant?.subscription_tier} className="mb-3" />
                         <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                            {tenant?.subscription_tier === 'basic' && (
-                                <>
-                                    <p>• 1 Research Cycle</p>
-                                    <p>• Up to 100 Students</p>
-                                    <p>• Up to 10 Advisers</p>
-                                    <p>• Up to 30 Panelists</p>
-                                </>
-                            )}
-                            {tenant?.subscription_tier === 'standard' && (
-                                <>
-                                    <p>• 1 Research Cycle</p>
-                                    <p>• Up to 150 Students</p>
-                                    <p>• Repository search</p>
-                                    <p>• CSV exports</p>
-                                    <p>• Email notifications</p>
-                                </>
-                            )}
-                            {tenant?.subscription_tier === 'premium' && (
-                                <>
-                                    <p>• Up to 3 Active Research Cycles</p>
-                                    <p>• Up to 300 Students</p>
-                                    <p>• Unlimited Advisers & Panelists</p>
-                                    <p>• All features included</p>
-                                    <p>• Priority support</p>
-                                </>
+                            {tenant?.features?.length > 0 ? (
+                                tenant.features.map((feature, i) => (
+                                    <p key={i}>• {feature}</p>
+                                ))
+                            ) : (
+                                <p className="italic opacity-50">No feature details available.</p>
                             )}
                         </div>
                     </div>
@@ -116,7 +103,8 @@ export default function SettingsIndex({ tenant }) {
                         <div className="p-5">
                             <p className="text-xs text-gray-500 mb-2">Theme Preview</p>
                             <div className="h-8 rounded-lg" style={{ backgroundColor: data.theme_color }} />
-                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-3">{data.name}</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-3 truncate">{data.name}</p>
+                            {data.institution_name && <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate opacity-70">@ {data.institution_name}</p>}
                         </div>
                     </div>
                 </div>

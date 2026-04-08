@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Submission;
-use App\Models\SubmissionVersion;
+
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +15,7 @@ class SubmissionController extends Controller
     public function index(Request $request)
     {
         $tenantId = $request->user()->tenant_id;
-        $query = Submission::where('tenant_id', $tenantId)->with('group', 'latestVersion', 'reviewer');
+        $query = Submission::where('tenant_id', $tenantId)->with('group', 'reviewer');
 
         if ($request->filled('status')) { $query->where('status', $request->status); }
         if ($request->filled('type')) { $query->where('type', $request->type); }
@@ -26,7 +26,7 @@ class SubmissionController extends Controller
 
     public function show(Submission $submission)
     {
-        $submission->load(['group.students', 'versions.uploader', 'comments.user', 'reviewer']);
+        $submission->load(['group.students', 'comments.user', 'reviewer']);
         return Inertia::render('Shared/Submissions/Show', compact('submission'));
     }
 
@@ -36,35 +36,34 @@ class SubmissionController extends Controller
             'research_group_id' => 'required|exists:research_groups,id',
             'type' => 'required|in:title_proposal,chapter,final_manuscript,defense_requirements',
             'file' => 'required|file|mimes:pdf,docx,doc,xlsx,zip|max:51200',
-            'change_notes' => 'nullable|string',
+            'remarks' => 'nullable|string',
         ]);
 
         $tenantId = $request->user()->tenant_id;
 
-        $submission = Submission::firstOrCreate([
+        $submission = Submission::updateOrCreate([
             'tenant_id' => $tenantId,
             'research_group_id' => $data['research_group_id'],
             'type' => $data['type'],
-        ], ['status' => 'draft']);
+        ], ['status' => 'submitted']);
 
         $file = $request->file('file');
+        
+        // Delete old file if exists
+        if ($submission->file_path) {
+            Storage::disk('local')->delete($submission->file_path);
+        }
+
         $path = $file->store("submissions/{$tenantId}/{$submission->id}", 'local');
 
-        $version = SubmissionVersion::where('submission_id', $submission->id)->max('version') ?? 0;
-
-        SubmissionVersion::create([
-            'tenant_id' => $tenantId,
-            'submission_id' => $submission->id,
-            'uploaded_by' => $request->user()->id,
+        $submission->update([
             'file_path' => $path,
             'file_name' => $file->getClientOriginalName(),
             'file_type' => $file->getMimeType(),
             'file_size' => $file->getSize(),
-            'version' => $version + 1,
-            'change_notes' => $data['change_notes'] ?? null,
+            'uploaded_by' => $request->user()->id,
+            'remarks' => $data['remarks'] ?? $submission->remarks,
         ]);
-
-        $submission->update(['status' => 'submitted']);
 
         return back()->with('success', 'Document submitted successfully.');
     }
@@ -107,7 +106,7 @@ class SubmissionController extends Controller
         $tenantId = $request->user()->tenant_id;
         $submissions = Submission::where('tenant_id', $tenantId)
             ->whereHas('group', fn ($q) => $q->where('adviser_id', $request->user()->id))
-            ->with('group', 'latestVersion')
+            ->with('group')
             ->latest()->paginate(15);
         return Inertia::render('Adviser/Submissions/Index', compact('submissions'));
     }
@@ -118,7 +117,7 @@ class SubmissionController extends Controller
         $group = $user->groupMemberships()->first()?->group;
 
         $submissions = $group
-            ? Submission::where('tenant_id', $user->tenant_id)->where('research_group_id', $group->id)->with('latestVersion', 'versions', 'comments.user')->get()
+            ? Submission::where('tenant_id', $user->tenant_id)->where('research_group_id', $group->id)->with('comments.user')->get()
             : collect();
 
         return Inertia::render('Student/Submissions/Index', compact('submissions', 'group'));

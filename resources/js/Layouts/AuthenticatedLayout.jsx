@@ -55,7 +55,7 @@ export default function AuthenticatedLayout({ children }) {
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';
 
     return (
-        <div className={cn("min-h-screen bg-gray-50 dark:bg-gray-950 flex transition-colors duration-500", context === 'department' && 'theme-department')}>
+        <div className={cn("min-h-screen bg-gray-50 dark:bg-gray-950 flex transition-colors duration-500", context === 'portal' && 'theme-portal')}>
             {/* Mobile overlay */}
             {mobileOpen && (
                 <div

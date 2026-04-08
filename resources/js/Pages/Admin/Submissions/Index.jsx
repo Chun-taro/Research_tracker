@@ -93,8 +93,8 @@ export default function SubmissionsIndex({ submissions, filters }) {
                                     <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400 capitalize">
                                         {sub.type?.replace(/_/g, ' ')}
                                     </td>
-                                    <td className="px-5 py-3.5 text-gray-500 text-xs max-w-xs truncate">
-                                        {sub.latest_version?.file_name ?? '—'}
+                                    <td className="px-5 py-3.5 text-gray-50 text-xs max-w-xs truncate">
+                                        {sub.file_name ?? '—'}
                                     </td>
                                     <td className="px-5 py-3.5"><StatusBadge status={sub.status} /></td>
                                     <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">{sub.reviewer?.name ?? '—'}</td>
