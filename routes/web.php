@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\RepositoryController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Support\SupportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -80,6 +81,10 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::post('billing/checkout', [\App\Http\Controllers\TenantSubscriptionController::class, 'checkout'])->name('billing.checkout');
         Route::get('billing/success', [\App\Http\Controllers\TenantSubscriptionController::class, 'success'])->name('billing.success');
         Route::get('billing/cancel', [\App\Http\Controllers\TenantSubscriptionController::class, 'cancel'])->name('billing.cancel');
+
+        // Support & Bug Reporting
+        Route::get('support', [SupportController::class, 'index'])->name('support.index');
+        Route::post('support', [SupportController::class, 'store'])->name('support.store');
     });
 
     // ------- LANDLORD (CENTRAL SYSTEM) ROUTES -------
@@ -104,6 +109,10 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
 
         // System History
         Route::get('/system-history', [\App\Http\Controllers\Landlord\DashboardController::class, 'systemHistory'])->name('system-history');
+
+        // Support Tickets Management
+        Route::get('/tickets', [\App\Http\Controllers\Landlord\SupportController::class, 'index'])->name('tickets.index');
+        Route::patch('/tickets/{ticket}', [\App\Http\Controllers\Landlord\SupportController::class, 'update'])->name('tickets.update');
     });
 
     // ------- ADVISER ROUTES -------

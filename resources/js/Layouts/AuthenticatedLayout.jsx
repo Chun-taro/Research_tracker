@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutDashboard, Users, BookOpen, FileText, Upload, Archive,
     Calendar, BarChart2, Settings, Bell, ChevronLeft, ChevronRight,
-    LogOut, User, Menu, X, GraduationCap, FileCheck, Database, CreditCard
+    LogOut, User, Menu, X, GraduationCap, FileCheck, Database, CreditCard, LifeBuoy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +20,7 @@ const roleNavItems = {
         { label: 'Reports', href: '/admin/reports', icon: BarChart2 },
         { label: 'Settings', href: '/admin/settings', icon: Settings },
         { label: 'Billing & Plan', href: '/admin/billing', icon: CreditCard },
+        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
     ],
     adviser: [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -28,11 +29,13 @@ const roleNavItems = {
         { label: 'Schedules', href: '/adviser/schedules', icon: Calendar },
         { label: 'Templates', href: '/adviser/templates', icon: Upload },
         { label: 'Repository', href: '/adviser/repository', icon: Database },
+        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
     ],
     panelist: [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Assignments', href: '/panelist/assignments', icon: GraduationCap },
         { label: 'Schedules', href: '/panelist/schedules', icon: Calendar },
+        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
     ],
     student: [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -41,6 +44,7 @@ const roleNavItems = {
         { label: 'Templates', href: '/student/templates', icon: Upload },
         { label: 'Repository', href: '/student/repository', icon: Database },
         { label: 'Schedules', href: '/student/schedules', icon: Calendar },
+        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
     ],
 };
 

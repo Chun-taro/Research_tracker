@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import {
     ChevronLeft, ChevronRight, LogOut, Shield, Menu, X, Users, History, 
-    LayoutDashboard, CreditCard
+    LayoutDashboard, CreditCard, LifeBuoy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +18,7 @@ export default function LandlordLayout({ children }) {
         { label: 'Subscription Plans', href: '/landlord/plans', icon: CreditCard },
         { label: 'Revenue & Tracking', href: '/landlord/subscriptions', icon: CreditCard },
         { label: 'System History', href: '/landlord/system-history', icon: History },
+        { label: 'Support Tickets', href: '/landlord/tickets', icon: LifeBuoy },
     ];
 
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';
