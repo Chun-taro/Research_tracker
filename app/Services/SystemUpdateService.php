@@ -107,11 +107,25 @@ class SystemUpdateService
      */
     protected function getLocalHistory($limit = 5)
     {
+        // Survival check: Is this even a git repository?
+        if (!is_dir(base_path('.git'))) {
+            return [];
+        }
+
         try {
             $currentHash = $this->getCurrentVersion();
-            $output = shell_exec("git log -n {$limit} --pretty=format:\"%h|%H|%s|%an|%ai\"");
             
-            if (!$output) return [];
+            // Check if git is available in the path
+            $gitCheck = shell_exec("git --version 2>&1");
+            if (!$gitCheck || str_contains($gitCheck, 'not found') || str_contains($gitCheck, 'not recognized')) {
+                return [];
+            }
+
+            $output = shell_exec("git log -n {$limit} --pretty=format:\"%h|%H|%s|%an|%ai\" 2>&1");
+            
+            if (!$output || str_contains($output, 'fatal:')) {
+                return [];
+            }
 
             $commits = explode("\n", trim($output));
             return collect($commits)->map(function($line) use ($currentHash) {
@@ -129,6 +143,7 @@ class SystemUpdateService
                 ];
             })->filter()->values();
         } catch (\Exception $e) {
+            \Log::warning("SystemUpdateService: Failed to fetch local git history. " . $e->getMessage());
             return [];
         }
     }

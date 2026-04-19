@@ -18,6 +18,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // 0. Seed Subscription Tiers first
+        $this->call(SubscriptionTierSeeder::class);
+        $this->command->info('✅ Seeded Subscription Tiers (Landlord DB)');
+
         // 1. Create Super Admin (Platform Owner) in Landlord DB
         $superAdmin = User::create([
             'name' => 'System Administrator',
