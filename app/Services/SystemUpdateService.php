@@ -68,13 +68,7 @@ class SystemUpdateService
      */
     public function getHistory($limit = 5)
     {
-        $localHistory = $this->getLocalHistory($limit);
-        
-        if (!empty($localHistory)) {
-            return $localHistory;
-        }
-
-        // Fallback to GitHub API if local history fails
+        // GitHub API First (Authoritative Source)
         try {
             $url = "https://api.github.com/repos/{$this->repoOwner}/{$this->repoName}/commits";
             $response = Http::withHeaders($this->getHeaders())
@@ -97,9 +91,12 @@ class SystemUpdateService
                     ];
                 });
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \Log::info("SystemUpdateService: GitHub API unavailable, falling back to local history.");
+        }
 
-        return [];
+        // Local Fallback (if GitHub is unreachable or rate limited)
+        return $this->getLocalHistory($limit);
     }
 
     /**

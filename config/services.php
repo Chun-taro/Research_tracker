@@ -41,9 +41,9 @@ return [
     ],
 
     'github' => [
-        'owner' => 'Chun-taro',
-        'repo' => 'Research_tracker',
-        'branch' => 'main',
+        'owner' => env('GITHUB_OWNER', 'Chun-taro'),
+        'repo' => env('GITHUB_REPO', 'Research_tracker'),
+        'branch' => env('GITHUB_BRANCH', 'main'),
     ],
 
 ];
