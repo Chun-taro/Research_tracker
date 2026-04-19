@@ -27,16 +27,23 @@ class RepositoryController extends Controller
 
         $items = $query->orderByDesc('created_at')->paginate(12)->withQueryString();
 
+        $groups = ResearchGroup::where('tenant_id', $tenantId)->orderBy('title')->get(['id', 'title']);
+
         return Inertia::render('Shared/Repository/Index', [
             'items' => $items,
             'filters' => $request->only(['search', 'year']),
+            'groups' => $groups,
         ]);
     }
 
     public function store(Request $request)
     {
+        $tenantId = $request->user()->tenant_id;
         $data = $request->validate([
-            'research_group_id' => 'required|exists:research_groups,id',
+            'research_group_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('research_groups', 'id')->where('tenant_id', $tenantId)
+            ],
             'title' => 'required|string|max:255',
             'abstract' => 'required|string',
             'keywords' => 'nullable|string',

@@ -23,10 +23,12 @@ class ScheduleController extends Controller
         return Inertia::render('Admin/Schedules/Index', compact('schedules', 'groups'));
     }
 
-    public function store(Request $request)
-    {
+        $tenantId = $request->user()->tenant_id;
         $data = $request->validate([
-            'research_group_id' => 'required|exists:research_groups,id',
+            'research_group_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('research_groups', 'id')->where('tenant_id', $tenantId)
+            ],
             'type' => 'required|in:proposal_defense,final_defense,consultation',
             'scheduled_at' => 'required|date|after:now',
             'venue' => 'nullable|string|max:255',
