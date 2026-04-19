@@ -65,7 +65,7 @@ function TenantModal({ tenant, plans, onClose }) {
                             <select value={data.subscription_tier} onChange={e => setData('subscription_tier', e.target.value)}
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-slate-50 outline-none">
                                 {plans?.map(plan => (
-                                    <option key={plan.id} value={plan.slug}>{plan.name} (${plan.price})</option>
+                                    <option key={plan.id} value={plan.slug}>{plan.name} (₱{parseFloat(plan.price).toLocaleString()})</option>
                                 ))}
                             </select>
                         </div>
@@ -170,17 +170,17 @@ export default function TenantIndex({ tenants, plans, filters }) {
                                     <div className="flex items-center bg-amber-50/50 rounded-lg px-1 py-0.5 border border-amber-100 shadow-sm mr-1">
                                         <button 
                                             onClick={() => router.post(`/landlord/tenants/${tenant.id}/mock-subscription`, { tier: 'basic' })} 
-                                            title="Mock Basic (₱1,000)"
+                                            title="Mock Basic (₱5,000)"
                                             className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-amber-600 hover:bg-amber-500 hover:text-white rounded-md transition-all"
                                         >B</button>
                                         <button 
                                             onClick={() => router.post(`/landlord/tenants/${tenant.id}/mock-subscription`, { tier: 'standard' })} 
-                                            title="Mock Standard (₱2,500)"
+                                            title="Mock Standard (₱15,000)"
                                             className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-amber-600 hover:bg-amber-500 hover:text-white rounded-md transition-all"
                                         >S</button>
                                         <button 
                                             onClick={() => router.post(`/landlord/tenants/${tenant.id}/mock-subscription`, { tier: 'premium' })} 
-                                            title="Mock Premium (₱4,000)"
+                                            title="Mock Premium (₱35,000)"
                                             className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-amber-600 hover:bg-amber-500 hover:text-white rounded-md transition-all"
                                         >P</button>
                                     </div>
