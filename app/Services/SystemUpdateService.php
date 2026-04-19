@@ -68,6 +68,13 @@ class SystemUpdateService
      */
     public function getHistory($limit = 5)
     {
+        $localHistory = $this->getLocalHistory($limit);
+        
+        if (!empty($localHistory)) {
+            return $localHistory;
+        }
+
+        // Fallback to GitHub API if local history fails
         try {
             $url = "https://api.github.com/repos/{$this->repoOwner}/{$this->repoName}/commits";
             $response = Http::withHeaders($this->getHeaders())
@@ -93,6 +100,37 @@ class SystemUpdateService
         } catch (\Exception $e) {}
 
         return [];
+    }
+
+    /**
+     * Get history from local git repository.
+     */
+    protected function getLocalHistory($limit = 5)
+    {
+        try {
+            $currentHash = $this->getCurrentVersion();
+            $output = shell_exec("git log -n {$limit} --pretty=format:\"%h|%H|%s|%an|%ai\"");
+            
+            if (!$output) return [];
+
+            $commits = explode("\n", trim($output));
+            return collect($commits)->map(function($line) use ($currentHash) {
+                $parts = explode('|', $line);
+                if (count($parts) < 5) return null;
+
+                return [
+                    'sha' => $parts[0],
+                    'full_sha' => $parts[1],
+                    'message' => $parts[2],
+                    'author' => $parts[3],
+                    'date' => $parts[4],
+                    'is_current' => $parts[1] === $currentHash,
+                    'url' => "https://github.com/{$this->repoOwner}/{$this->repoName}/commit/{$parts[1]}",
+                ];
+            })->filter()->values();
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**
