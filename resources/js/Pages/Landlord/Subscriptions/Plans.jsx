@@ -5,6 +5,21 @@ import { Plus, CreditCard, Trash2, Edit2, X, Check, Info } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
+const PREDEFINED_FEATURES = [
+    'Custom Branding',
+    'Advanced Analytics',
+    'Priority Support',
+    'Unlimited Research Groups',
+    'Bulk Submission Exports',
+    'Panelist Scheduling Engine',
+    'Email Notifications',
+    'Audit Trails (Version Control)',
+    'Custom Domain Support',
+    'API Access',
+    'Multi-Campus Support',
+    'Dedicated Account Manager'
+];
+
 function PlanModal({ plan, onClose }) {
     const { data, setData, post, patch, processing, errors } = useForm({
         name: plan?.name ?? '',
@@ -18,14 +33,24 @@ function PlanModal({ plan, onClose }) {
 
     const [newFeature, setNewFeature] = useState('');
 
-    const addFeature = () => {
-        if (!newFeature.trim()) return;
+    const toggleFeature = (feature) => {
+        if (data.features.includes(feature)) {
+            setData('features', data.features.filter(f => f !== feature));
+        } else {
+            setData('features', [...data.features, feature]);
+        }
+    };
+
+    const addCustomFeature = () => {
+        if (!newFeature.trim() || data.features.includes(newFeature.trim())) return;
         setData('features', [...data.features, newFeature.trim()]);
         setNewFeature('');
     };
 
-    const removeFeature = (index) => {
-        setData('features', data.features.filter((_, i) => i !== index));
+    const randomizeFeatures = () => {
+        const shuffled = [...PREDEFINED_FEATURES].sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 4 + Math.floor(Math.random() * 4));
+        setData('features', selected);
     };
 
     const handleSubmit = (e) => {
@@ -81,20 +106,49 @@ function PlanModal({ plan, onClose }) {
                     </div>
 
                     <div>
-                        <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Features Included</label>
-                        <div className="flex gap-2 mb-3">
-                            <input type="text" value={newFeature} onChange={e => setNewFeature(e.target.value)} placeholder="e.g. Unlimited Groups"
-                                className="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
-                            <button type="button" onClick={addFeature} className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors">Add</button>
+                        <div className="flex items-center justify-between mb-3">
+                            <label className="block text-xs font-black uppercase tracking-widest text-slate-400">Platform Features</label>
+                            <button type="button" onClick={randomizeFeatures} className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 uppercase tracking-tight bg-indigo-50 px-2 py-1 rounded-md transition-colors">
+                                Randomize Features
+                            </button>
                         </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 mb-6">
+                            {PREDEFINED_FEATURES.map(f => (
+                                <label key={f} className={cn(
+                                    "flex items-center gap-3 p-2.5 rounded-xl border transition-all cursor-pointer group",
+                                    data.features.includes(f) 
+                                        ? "bg-indigo-50 border-indigo-200 ring-2 ring-indigo-500/5" 
+                                        : "bg-white border-slate-100 hover:border-slate-200"
+                                )}>
+                                    <input type="checkbox" checked={data.features.includes(f)} onChange={() => toggleFeature(f)} className="hidden" />
+                                    <div className={cn(
+                                        "h-4 w-4 rounded-md border flex items-center justify-center transition-all",
+                                        data.features.includes(f) ? "bg-indigo-600 border-indigo-600" : "bg-white border-slate-300 group-hover:border-slate-400"
+                                    )}>
+                                        {data.features.includes(f) && <Check size={10} className="text-white" strokeWidth={4} />}
+                                    </div>
+                                    <span className={cn("text-xs font-medium", data.features.includes(f) ? "text-indigo-900" : "text-slate-600")}>{f}</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Additional Custom Features</label>
+                        <div className="flex gap-2 mb-3">
+                            <input type="text" value={newFeature} onChange={e => setNewFeature(e.target.value)} placeholder="e.g. 24/7 Phone Support"
+                                className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                            <button type="button" onClick={addCustomFeature} className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-colors">Add</button>
+                        </div>
+                        
+                        {/* Summary of manual/custom features not in the predefined list */}
                         <div className="flex flex-wrap gap-2">
-                            {data.features.map((f, i) => (
-                                <span key={i} className="flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold ring-1 ring-indigo-200 group">
+                             {data.features.filter(f => !PREDEFINED_FEATURES.includes(f)).map((f, i) => (
+                                <span key={i} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border border-slate-200 group">
                                     {f}
-                                    <button type="button" onClick={() => removeFeature(i)} className="hover:text-red-500"><X size={12} /></button>
+                                    <button type="button" onClick={() => toggleFeature(f)} className="hover:text-red-500"><X size={12} /></button>
                                 </span>
                             ))}
-                            {data.features.length === 0 && <p className="text-xs text-slate-400 italic">No features added yet.</p>}
+                            {data.features.length === 0 && <p className="text-xs text-slate-400 italic">No features selected yet.</p>}
                         </div>
                     </div>
 
