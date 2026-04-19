@@ -14,6 +14,8 @@ class SubscriptionTier extends Model
         'name',
         'price',
         'billing_cycle',
+        'primary_color',
+        'is_dark',
         'features',
         'limits',
         'is_active',
@@ -23,6 +25,7 @@ class SubscriptionTier extends Model
         'features' => 'array',
         'limits' => 'array',
         'is_active' => 'boolean',
+        'is_dark' => 'boolean',
         'price' => 'decimal:2',
     ];
 }

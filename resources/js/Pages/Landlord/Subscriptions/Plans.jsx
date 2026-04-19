@@ -1,7 +1,7 @@
 import LandlordLayout from '@/Layouts/LandlordLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { PageHeader } from '@/Components/PageHeader';
-import { Plus, CreditCard, Trash2, Edit2, X, Check, Info } from 'lucide-react';
+import { Plus, CreditCard, Trash2, Edit2, X, Check, Info, Moon } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +28,8 @@ function PlanModal({ plan, onClose }) {
         billing_cycle: plan?.billing_cycle ?? 'monthly',
         features: plan?.features ?? [],
         limits: plan?.limits ?? { students: 100, advisers: 10, panelists: 20, cycles: 1 },
+        primary_color: plan?.primary_color ?? '#6366f1',
+        is_dark: plan?.is_dark ?? false,
         is_active: plan?.is_active ?? true,
     });
 
@@ -102,6 +104,38 @@ function PlanModal({ plan, onClose }) {
                                 <option value="monthly">Monthly</option>
                                 <option value="yearly">Yearly</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                        <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Theme & Aesthetics</label>
+                        <div className="flex flex-wrap items-center gap-6">
+                            <div>
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-tight mb-2">Primary Accent Color</label>
+                                <div className="flex items-center gap-2">
+                                    <input type="color" value={data.primary_color} onChange={e => setData('primary_color', e.target.value)}
+                                        className="h-10 w-10 p-1 rounded-lg border border-slate-200 cursor-pointer" />
+                                    <div className="flex gap-1.5 pl-2 border-l border-slate-200">
+                                        {['#10b981', '#6366f1', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6'].map(c => (
+                                            <button key={c} type="button" onClick={() => setData('primary_color', c)}
+                                                className="h-5 w-5 rounded-full border border-white ring-1 ring-slate-200 shadow-sm"
+                                                style={{ backgroundColor: c }} />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 pt-4 sm:pt-0">
+                                <label 
+                                    className={cn(
+                                        "flex items-center gap-3 px-4 py-2.5 rounded-xl border-2 transition-all cursor-pointer",
+                                        data.is_dark ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-100 text-slate-600 shadow-sm"
+                                    )}
+                                >
+                                    <input type="checkbox" checked={data.is_dark} onChange={e => setData('is_dark', e.target.checked)} className="hidden" />
+                                    <Moon size={18} className={data.is_dark ? "text-amber-400" : "text-slate-400"} />
+                                    <span className="text-xs font-bold uppercase tracking-widest leading-none">Dark Mode Base</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -197,39 +231,58 @@ export default function Plans({ plans }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {plans.map(plan => (
-                    <div key={plan.id} className={cn("bg-white rounded-2xl border transition-all hover:shadow-xl group", plan.is_active ? "border-slate-100" : "border-slate-200 opacity-60")}>
-                        <div className="p-6 border-b border-slate-50 flex justify-between items-start">
+                    <div key={plan.id} className={cn(
+                        "bg-white rounded-2xl border transition-all hover:shadow-xl group flex flex-col relative", 
+                        plan.is_active ? "border-slate-100" : "border-slate-200 opacity-60",
+                        plan.is_dark && "bg-slate-950 text-white border-slate-800"
+                    )}>
+                        {plan.is_dark && (
+                            <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+                        )}
+                        
+                        <div className="p-6 border-b border-slate-50 flex justify-between items-start relative z-10">
                             <div>
-                                <h3 className="font-black text-xl text-slate-900 group-hover:text-indigo-600 transition-colors">{plan.name}</h3>
-                                <p className="text-xs font-bold text-slate-400 tracking-widest rounded-lg bg-slate-50 inline-block px-2 py-1 mt-2 uppercase">{plan.slug}</p>
+                                <h3 className={cn("font-black text-xl transition-colors", plan.is_dark ? "text-white" : "text-slate-900 group-hover:text-indigo-600")}>{plan.name}</h3>
+                                <p className={cn("text-xs font-bold tracking-widest rounded-lg inline-block px-2 py-1 mt-2 uppercase", 
+                                    plan.is_dark ? "bg-white/10 text-white" : "bg-slate-50 text-slate-400")}>{plan.slug}</p>
                             </div>
                             <div className="flex gap-2">
-                                <button onClick={() => setModal(plan)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"><Edit2 size={18} /></button>
-                                <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={18} /></button>
+                                <button onClick={() => setModal(plan)} className={cn("p-2 rounded-lg transition-all", 
+                                    plan.is_dark ? "text-white/40 hover:text-white hover:bg-white/10" : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-50")}>
+                                    <Edit2 size={18} />
+                                </button>
+                                <button className={cn("p-2 rounded-lg transition-all", 
+                                    plan.is_dark ? "text-white/40 hover:text-red-400 hover:bg-red-500/10" : "text-slate-400 hover:text-red-600 hover:bg-red-50")}>
+                                    <Trash2 size={18} />
+                                </button>
                             </div>
                         </div>
-                        <div className="p-6 space-y-4">
+                        <div className="p-6 space-y-4 relative z-10">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-black text-slate-900">₱{parseFloat(plan.price).toLocaleString()}</span>
-                                <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">/ {plan.billing_cycle}</span>
+                                <span className={cn("text-3xl font-black", plan.is_dark ? "text-white" : "text-slate-900")} 
+                                    style={plan.is_dark ? { color: plan.primary_color } : {}}>
+                                    ₱{parseFloat(plan.price).toLocaleString()}
+                                </span>
+                                <span className={cn("text-sm font-bold uppercase tracking-widest", plan.is_dark ? "text-slate-400" : "text-slate-400")}>/ {plan.billing_cycle}</span>
                             </div>
 
                             <ul className="space-y-3">
                                 {plan.features?.map((f, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-sm text-slate-600 font-medium">
-                                        <div className="h-5 w-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                            <Check size={12} />
+                                    <li key={i} className={cn("flex items-center gap-3 text-sm font-medium", plan.is_dark ? "text-slate-300" : "text-slate-600")}>
+                                        <div className="h-5 w-5 rounded-full flex items-center justify-center shrink-0" 
+                                            style={{ backgroundColor: `${plan.primary_color}20`, color: plan.primary_color }}>
+                                            <Check size={12} strokeWidth={4} />
                                         </div>
                                         {f}
                                     </li>
                                 ))}
                             </ul>
 
-                            <div className="pt-4 border-t border-slate-50 grid grid-cols-2 gap-y-3">
+                            <div className={cn("pt-4 border-t grid grid-cols-2 gap-y-3", plan.is_dark ? "border-slate-800" : "border-slate-50")}>
                                 {Object.entries(plan.limits || {}).map(([key, val]) => (
                                     <div key={key} className="flex flex-col">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{key}</span>
-                                        <span className="text-xs font-bold text-slate-700">{val === -1 ? 'Unlimited' : val}</span>
+                                        <span className={cn("text-[10px] font-black uppercase tracking-widest", plan.is_dark ? "text-slate-500" : "text-slate-400")}>{key}</span>
+                                        <span className={cn("text-xs font-bold", plan.is_dark ? "text-slate-300" : "text-slate-700")}>{val === -1 ? 'Unlimited' : val}</span>
                                     </div>
                                 ))}
                             </div>

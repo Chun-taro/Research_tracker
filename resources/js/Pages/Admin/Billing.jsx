@@ -27,11 +27,8 @@ export default function Billing({ tenant, subscription, payments, plans }) {
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-10">
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-6">
                     <div className="flex items-center gap-4">
-                        <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center text-white shadow-lg",
-                            tenant.subscription_tier === 'premium' ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-200' :
-                            tenant.subscription_tier === 'standard' ? 'bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-indigo-200' :
-                            'bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-emerald-200'
-                        )}>
+                        <div className={cn("h-16 w-16 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200/20")}
+                            style={{ backgroundColor: plans.find(p => p.slug === tenant.subscription_tier)?.primary_color || '#6366f1' }}>
                             <Building2 size={32} />
                         </div>
                         <div>
@@ -74,9 +71,12 @@ export default function Billing({ tenant, subscription, payments, plans }) {
                         return (
                             <div key={plan.id} className={cn(
                                 "rounded-3xl border-2 p-8 transition-all relative overflow-hidden flex flex-col justify-between",
-                                isPopular ? "bg-slate-950 text-white border-amber-500 shadow-2xl shadow-amber-500/20" : "bg-white text-slate-900 border-slate-100 hover:border-indigo-300 shadow-sm",
-                                isCurrent && (isPopular ? "ring-4 ring-amber-500/30" : "ring-4 ring-indigo-500/30 border-indigo-500")
+                                plan.is_dark ? "bg-slate-950 text-white border-slate-800 shadow-2xl" : "bg-white text-slate-900 border-slate-100 hover:border-indigo-300 shadow-sm",
+                                isCurrent && (plan.is_dark ? "ring-4 ring-white/10" : "ring-4 ring-indigo-500/30 border-indigo-500")
                             )}>
+                                {plan.is_dark && (
+                                    <div className="absolute top-0 right-0 h-32 w-32 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+                                )}
                                 {isCurrent && (
                                     <div className={cn("absolute top-0 right-0 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-bl-xl shadow-sm z-20", 
                                         isPopular ? "bg-amber-500 text-white" : "bg-indigo-600 text-white"
@@ -86,22 +86,22 @@ export default function Billing({ tenant, subscription, payments, plans }) {
                                 )}
                                 
                                 <div className="relative z-10">
-                                    <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center mb-6", 
-                                        isPopular ? "bg-amber-500/20 text-amber-400 border border-amber-500/20" : "bg-indigo-50 text-indigo-600 border border-indigo-100"
-                                    )}>
+                                    <div className="h-12 w-12 rounded-xl flex items-center justify-center mb-6" 
+                                        style={plan.is_dark ? { backgroundColor: `${plan.primary_color}20`, color: plan.primary_color, borderColor: `${plan.primary_color}40`, borderStyle: 'solid', borderWidth: '1px' } : { backgroundColor: `${plan.primary_color}10`, color: plan.primary_color }}>
                                         {index === 0 ? <Shield size={24} /> : index === 1 ? <Zap size={24} /> : <CreditCard size={24} />}
                                     </div>
 
-                                    <h4 className={cn("text-xl font-black mb-2 flex items-center gap-2", isPopular ? "text-white" : "text-slate-900")}>
+                                    <h4 className={cn("text-xl font-black mb-2 flex items-center gap-2", plan.is_dark ? "text-white" : "text-slate-900")}>
                                         {plan.name}
-                                        {isPopular && <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md uppercase tracking-wider font-bold border border-amber-500/20">Pro</span>}
+                                        {plan.is_dark && <span className="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded-md uppercase tracking-wider font-bold border border-white/20" style={{ color: plan.primary_color, borderColor: `${plan.primary_color}40` }}>Pro</span>}
                                     </h4>
 
                                     <div className="flex items-baseline gap-1 mb-6">
-                                        <span className={cn("text-4xl font-black", isPopular ? "text-white" : "text-slate-900")}>
+                                        <span className={cn("text-4xl font-black", plan.is_dark ? "text-white" : "text-slate-900")}
+                                            style={plan.is_dark ? { color: plan.primary_color } : {}}>
                                             ₱{parseFloat(plan.price).toLocaleString()}
                                         </span>
-                                        <span className={cn("text-xs font-bold uppercase tracking-widest", isPopular ? "text-slate-400" : "text-slate-400")}>
+                                        <span className={cn("text-xs font-bold uppercase tracking-widest", plan.is_dark ? "text-slate-400" : "text-slate-400")}>
                                             / {plan.billing_cycle}
                                         </span>
                                     </div>
@@ -109,10 +109,10 @@ export default function Billing({ tenant, subscription, payments, plans }) {
                                     <ul className="space-y-4 mb-10">
                                         {plan.features?.map((feature, fIndex) => (
                                             <li key={fIndex} className="flex items-start gap-3 text-sm font-medium">
-                                                <div className={cn("mt-0.5 shrink-0", isPopular ? "text-amber-400" : "text-indigo-500")}>
+                                                <div className="mt-0.5 shrink-0" style={{ color: plan.primary_color }}>
                                                     <CheckCircle2 size={16} />
                                                 </div>
-                                                <span className={isPopular ? "text-slate-300" : "text-slate-600"}>{feature}</span>
+                                                <span className={plan.is_dark ? "text-slate-300" : "text-slate-600"}>{feature}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -122,11 +122,12 @@ export default function Billing({ tenant, subscription, payments, plans }) {
                                     onClick={() => handleCheckout(plan.slug)} 
                                     disabled={submitting === plan.slug}
                                     className={cn(
-                                        "relative z-10 w-full py-4 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] disabled:opacity-50",
+                                        "relative z-10 w-full py-4 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] disabled:opacity-50 shadow-lg",
                                         isCurrent 
-                                            ? (isPopular ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100")
-                                            : (isPopular ? "bg-amber-500 text-white hover:bg-amber-600 shadow-xl shadow-amber-500/30" : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-500/20")
+                                            ? (plan.is_dark ? "bg-white/10 text-white border border-white/20 hover:bg-white/20 shadow-none" : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 shadow-none")
+                                            : (plan.is_dark ? "bg-white text-slate-900 hover:bg-slate-100" : "bg-indigo-600 text-white hover:bg-indigo-700")
                                     )}
+                                    style={!isCurrent ? { backgroundColor: plan.primary_color, boxShadow: `0 10px 20px -10px ${plan.primary_color}60` } : {}}
                                 >
                                     {submitting === plan.slug ? (
                                         <span className="flex items-center justify-center gap-2">
