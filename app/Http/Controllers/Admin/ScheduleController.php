@@ -23,6 +23,8 @@ class ScheduleController extends Controller
         return Inertia::render('Admin/Schedules/Index', compact('schedules', 'groups'));
     }
 
+    public function store(Request $request)
+    {
         $tenantId = $request->user()->tenant_id;
         $data = $request->validate([
             'research_group_id' => [
