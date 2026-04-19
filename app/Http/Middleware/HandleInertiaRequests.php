@@ -25,6 +25,10 @@ class HandleInertiaRequests extends Middleware
             $tenant = Tenant::find($user->tenant_id);
         }
 
+        $updateCheck = $user && ($user->role === 'admin' || $request->is('landlord*')) 
+            ? (new \App\Services\SystemUpdateService())->checkUpdate() 
+            : ['update_available' => false];
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -36,6 +40,7 @@ class HandleInertiaRequests extends Middleware
                     'avatar_path' => $user->avatar_path,
                     'tenant_id' => $user->tenant_id,
                 ] : null,
+                'update_available' => $updateCheck['update_available'] ?? false,
             ],
             'tenant' => $tenant ? array_merge([
                 'id' => $tenant->id,

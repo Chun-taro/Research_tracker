@@ -88,9 +88,9 @@ function PlanModal({ plan, onClose }) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Price (USD)</label>
+                            <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Price (PHP)</label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₱</span>
                                 <input type="number" step="0.01" value={data.price} onChange={e => setData('price', e.target.value)}
                                     className="w-full border border-slate-200 rounded-xl pl-8 pr-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" required />
                             </div>
@@ -210,7 +210,7 @@ export default function Plans({ plans }) {
                         </div>
                         <div className="p-6 space-y-4">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-black text-slate-900">${plan.price}</span>
+                                <span className="text-3xl font-black text-slate-900">₱{parseFloat(plan.price).toLocaleString()}</span>
                                 <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">/ {plan.billing_cycle}</span>
                             </div>
 

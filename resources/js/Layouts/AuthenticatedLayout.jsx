@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutDashboard, Users, BookOpen, FileText, Upload, Archive,
     Calendar, BarChart2, Settings, Bell, ChevronLeft, ChevronRight,
-    LogOut, User, Menu, X, GraduationCap, FileCheck, Database, CreditCard, LifeBuoy
+    LogOut, User, Menu, X, GraduationCap, FileCheck, Database, CreditCard, LifeBuoy, AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -177,6 +177,27 @@ export default function AuthenticatedLayout({ children }) {
 
                 {/* Page content */}
                 <main className="flex-1 overflow-auto p-4 lg:p-6">
+                    {auth.update_available && (
+                        <div className="mb-6 animate-in slide-in-from-top duration-500 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4 shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                                    <AlertTriangle size={20} className="animate-pulse" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-bold text-amber-900 leading-tight">System Update Available</h4>
+                                    <p className="text-xs text-amber-700/80 mt-0.5">Your device is behind the latest version on GitHub. Please run <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-amber-900 border border-amber-200">git pull origin main</code> to synchronize your system.</p>
+                                </div>
+                                <div className="hidden sm:block">
+                                    <Link 
+                                        href={context === 'landlord' ? "/landlord/dashboard" : "/dashboard"} 
+                                        className="px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-amber-600 transition-all whitespace-nowrap"
+                                    >
+                                        Check History
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {children}
                 </main>
             </div>

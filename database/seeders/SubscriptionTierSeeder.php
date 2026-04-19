@@ -16,7 +16,7 @@ class SubscriptionTierSeeder extends Seeder
             [
                 'slug' => 'basic',
                 'name' => 'Basic Plan',
-                'price' => 1000.00,
+                'price' => 5000.00,
                 'billing_cycle' => 'yearly',
                 'features' => ['Core Workflows', 'Student Submission Tracking'],
                 'limits' => ['groups' => 5],
@@ -25,7 +25,7 @@ class SubscriptionTierSeeder extends Seeder
             [
                 'slug' => 'standard',
                 'name' => 'Standard Plan',
-                'price' => 2500.00,
+                'price' => 15000.00,
                 'billing_cycle' => 'yearly',
                 'features' => ['Core Workflows', 'Advanced Scheduling', 'Priority Email Support'],
                 'limits' => ['groups' => 20],
@@ -34,7 +34,7 @@ class SubscriptionTierSeeder extends Seeder
             [
                 'slug' => 'premium',
                 'name' => 'Premium Plan',
-                'price' => 4000.00,
+                'price' => 35000.00,
                 'billing_cycle' => 'yearly',
                 'features' => ['Core Workflows', 'Unlimited Groups', 'API Access', '24/7 Dedicated Support'],
                 'limits' => ['groups' => 999999],
