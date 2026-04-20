@@ -41,7 +41,7 @@ SESSION_DOMAIN=.localhost
 DB_CONNECTION=landlord
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=research_tracker_landlord
+DB_DATABASE=research_tracker
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -57,7 +57,7 @@ GITHUB_REPO=Chun-taro/Research_tracker
 ### 4. Create the Central Database
 Before running migrations, you must legally create the central Landlord database. Open your MySQL client (e.g., phpMyAdmin, TablePlus) and execute:
 ```sql
-CREATE DATABASE research_tracker_landlord;
+CREATE DATABASE research_tracker;
 ```
 *(Note: Do not create the tenant databases manually! The system handles that automatically).*
 
@@ -105,4 +105,4 @@ If you created a portal named `bsit`, the system will automatically provision it
 ## 🛠 Troubleshooting
 - **Routing/Domain issues**: If `bsit.localhost` doesn't resolve on your Windows machine, ensure your browser caches are cleared, or temporarily use Chrome/Brave which resolves `.localhost` loopbacks automatically.
 - **Vite Manifest Error**: Ensure you ran `npm install` and that `npm run dev` is actively running in a terminal, OR run `npm run build` to compile static assets.
-- **SQL "Unknown Database" Error**: Ensure you explicitly executed `CREATE DATABASE research_tracker_landlord;` before running `php artisan migrate`.
+- **SQL "Unknown Database" Error**: Ensure you explicitly executed `CREATE DATABASE research_tracker;` before running `php artisan migrate`.
