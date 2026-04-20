@@ -96,8 +96,8 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Landlord\DashboardController::class, 'index'])->name('dashboard');
         
         // Tenant Management
-        Route::get('/tenants', [App\Http\Controllers\Landlord\TenantController::class, 'index'])->name('landlord.tenants');
-        Route::post('/tenants', [App\Http\Controllers\Landlord\TenantController::class, 'store']);
+        Route::get('/tenants', [App\Http\Controllers\Landlord\TenantController::class, 'index'])->name('tenants.index');
+        Route::post('/tenants', [App\Http\Controllers\Landlord\TenantController::class, 'store'])->name('tenants.store');
         Route::patch('/tenants/{tenant}', [App\Http\Controllers\Landlord\TenantController::class, 'update'])->name('tenants.update');
         Route::delete('/tenants/{tenant}', [App\Http\Controllers\Landlord\TenantController::class, 'destroy'])->name('tenants.destroy');
         Route::post('/tenants/{tenant}/subscription', [App\Http\Controllers\Landlord\TenantController::class, 'mockSubscription'])->name('tenants.mock-subscription');
