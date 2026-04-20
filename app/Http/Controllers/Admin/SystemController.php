@@ -51,17 +51,24 @@ class SystemController extends Controller
     public function applyUpdate()
     {
         try {
-            // Run git pull to fetch the latest codebase from GitHub
+            // 1. Run git pull to fetch the latest codebase
             $output = shell_exec('git pull origin main 2>&1');
             
-            // Clear the cache manually just in case, to force fresh views
+            // 2. Run Landlord Migrations to ensure DB schema is up-to-date
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--database' => 'landlord',
+                '--path' => 'database/migrations/landlord',
+                '--force' => true
+            ]);
+
+            // 3. Clear cache to force fresh state
             \Illuminate\Support\Facades\Artisan::call('cache:clear');
 
             if (str_contains($output, 'up to date')) {
-                return back()->with('success', 'System is already up to date.');
+                return back()->with('success', 'System is already up to date. Migrations verified.');
             }
 
-            return back()->with('success', 'Update applied successfully! Output: ' . substr($output, 0, 100) . '...');
+            return back()->with('success', 'Update applied and database migrated successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to apply update: ' . $e->getMessage());
         }
