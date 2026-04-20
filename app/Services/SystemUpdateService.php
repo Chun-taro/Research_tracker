@@ -18,6 +18,28 @@ class SystemUpdateService
         $this->repoName = config('services.github.repo', 'Research_tracker');
         $this->branch = config('services.github.branch', 'main');
         $this->token = env('GITHUB_TOKEN');
+        
+        // Break cache automatically if a new git commit/pull is detected
+        $this->autoInvalidateCacheIfUpdated();
+    }
+
+    /**
+     * Automatically clears version caches if the local branch has advanced (git pull / commit).
+     */
+    protected function autoInvalidateCacheIfUpdated()
+    {
+        $currentHash = $this->getCurrentVersion();
+        $cachedHash = Cache::get('system_last_known_hash');
+        
+        if ($cachedHash && $currentHash !== 'unknown' && $currentHash !== $cachedHash) {
+            // Codebase changed! Bust the versioning and update caches instantly.
+            Cache::forget('app_version_tag');
+            Cache::forget('github_update_check');
+        }
+        
+        if ($currentHash !== 'unknown') {
+            Cache::put('system_last_known_hash', $currentHash);
+        }
     }
 
     /**
