@@ -91,14 +91,11 @@ npm run dev
 
 Everything is driven by subdomains. Because `SESSION_DOMAIN=.localhost` is set, you can navigate locally to different branches.
 
-### Central System (Landlord)
-- **URL**: `http://localhost:8000` (or `http://admin.localhost:8000`)
-- **Login Credentials**: Check `database/seeders/DatabaseSeeder.php` for the default landlord admin account created during seeding.
-
-### Institution Portals (Tenants)
-If you created a portal named `bsit`, the system will automatically provision its database. 
-- **URL**: `http://bsit.localhost:8000`
-- **Login Credentials**: Use the initial Admin Password you set in the Landlord dashboard when creating the portal.
+### 🌐 Accessing the System
+- **Landlord Access (SaaS Admin):** Navigate to `http://localhost:8000` (or `http://admin.localhost:8000`). 
+  - **Email:** `superadmin@researchtracker.com`
+  - **Password:** `password`
+- **Tenant Portals:** When you create a tenant (e.g., `slug = bsit`), the app dynamically spins up a database and access portal at `http://bsit.localhost:8000`. Use the admin credentials you assigned to that portal to log in.
 
 ---
 
