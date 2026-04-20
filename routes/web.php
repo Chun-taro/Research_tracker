@@ -85,6 +85,9 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         // Support & Bug Reporting
         Route::get('support', [SupportController::class, 'index'])->name('support.index');
         Route::post('support', [SupportController::class, 'store'])->name('support.store');
+
+        // System Updates & Version Info
+        Route::get('system/updates', [\App\Http\Controllers\Admin\SystemController::class, 'updates'])->name('system.updates');
     });
 
     // ------- LANDLORD (CENTRAL SYSTEM) ROUTES -------

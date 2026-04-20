@@ -25,9 +25,13 @@ class HandleInertiaRequests extends Middleware
             $tenant = Tenant::find($user->tenant_id);
         }
 
-        $updateCheck = $user && ($user->role === 'admin' || $request->is('landlord*')) 
-            ? (new \App\Services\SystemUpdateService())->checkUpdate() 
+        $isAdminOrLandlord = $user && ($user->role === 'admin' || $request->is('landlord*'));
+        $updateCheck = $isAdminOrLandlord
+            ? (new \App\Services\SystemUpdateService())->checkUpdate()
             : ['update_available' => false];
+        $systemVersion = $isAdminOrLandlord
+            ? (new \App\Services\SystemUpdateService())->getVersionTag()
+            : null;
 
         return [
             ...parent::share($request),
@@ -51,6 +55,7 @@ class HandleInertiaRequests extends Middleware
                 'subscription_tier' => $tenant->subscription_tier,
             ], \App\Models\Landlord\SubscriptionTier::where('slug', $tenant->subscription_tier)->first()?->only(['features', 'limits']) ?? []) : null,
             'context' => $request->is('landlord*') ? 'landlord' : 'portal',
+            'system_version' => $systemVersion,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

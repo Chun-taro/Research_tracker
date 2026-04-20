@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     LayoutDashboard, Users, BookOpen, FileText, Upload, Archive,
     Calendar, BarChart2, Settings, Bell, ChevronLeft, ChevronRight,
-    LogOut, User, Menu, X, GraduationCap, FileCheck, Database, CreditCard, LifeBuoy, AlertTriangle
+    LogOut, User, Menu, X, GraduationCap, FileCheck, Database, CreditCard, LifeBuoy, AlertTriangle, Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +21,7 @@ const roleNavItems = {
         { label: 'Settings', href: '/admin/settings', icon: Settings },
         { label: 'Billing & Plan', href: '/admin/billing', icon: CreditCard },
         { label: 'Support', href: '/admin/support', icon: LifeBuoy },
+        { label: 'System Updates', href: '/admin/system/updates', icon: Zap },
     ],
     adviser: [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -189,10 +190,10 @@ export default function AuthenticatedLayout({ children }) {
                                 </div>
                                 <div className="hidden sm:block">
                                     <Link 
-                                        href={context === 'landlord' ? "/landlord/dashboard" : "/dashboard"} 
+                                        href={context === 'landlord' ? '/landlord/system-history' : '/admin/system/updates'} 
                                         className="px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-amber-600 transition-all whitespace-nowrap"
                                     >
-                                        Check History
+                                        View Updates
                                     </Link>
                                 </div>
                             </div>

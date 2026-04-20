@@ -33,6 +33,38 @@ class SystemUpdateService
     }
 
     /**
+     * Get the current version as a human-readable tag (e.g., v1.0.0).
+     * Tries local git tags first, then falls back to the GitHub Releases API.
+     */
+    public function getVersionTag(): string
+    {
+        return Cache::remember('app_version_tag', 3600, function () {
+            // 1. Try local git describe (fast, no network)
+            try {
+                $tag = trim(shell_exec('git describe --tags --abbrev=0 2>&1'));
+                if ($tag && !str_contains($tag, 'fatal') && !str_contains($tag, 'No names')) {
+                    return $tag;
+                }
+            } catch (\Exception $e) {
+                // continue to fallback
+            }
+
+            // 2. Try GitHub Releases API
+            try {
+                $url = "https://api.github.com/repos/{$this->repoOwner}/{$this->repoName}/releases/latest";
+                $response = Http::withHeaders($this->getHeaders())->get($url);
+                if ($response->successful()) {
+                    return $response->json('tag_name', 'v1.0.0');
+                }
+            } catch (\Exception $e) {
+                // continue to fallback
+            }
+
+            return 'v1.0.0';
+        });
+    }
+
+    /**
      * Check for updates from GitHub.
      */
     public function checkUpdate()
