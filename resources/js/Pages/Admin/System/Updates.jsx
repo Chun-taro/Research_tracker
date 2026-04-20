@@ -1,9 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
+import { useState } from 'react';
 import { PageHeader } from '@/Components/PageHeader';
 import {
     LifeBuoy, Zap, Clock, ShieldCheck, Mail, MessageSquare,
-    BookOpen, ExternalLink, CheckCircle, AlertTriangle, GitCommit, Tag
+    BookOpen, ExternalLink, CheckCircle, AlertTriangle, GitCommit, Tag, DownloadCloud, Loader2
 } from 'lucide-react';
 
 const TYPE_CONFIG = {
@@ -21,6 +22,16 @@ export default function Updates({ system_version, update_status = {}, changelog 
     const version = system_version || globalVersion || 'v1.0.0';
 
     const updateAvailable = update_status?.update_available ?? false;
+
+    const [updating, setUpdating] = useState(false);
+
+    const handleUpdate = () => {
+        setUpdating(true);
+        router.post(route('admin.system.updates.apply'), {}, {
+            preserveScroll: true,
+            onFinish: () => setUpdating(false),
+        });
+    };
 
     return (
         <AuthenticatedLayout>
@@ -63,9 +74,19 @@ export default function Updates({ system_version, update_status = {}, changelog 
                                 : `You are running the latest version.`}
                         </p>
                         {updateAvailable && (
-                            <div className="mt-4 p-3 rounded-xl bg-white/10 border border-white/20 text-xs text-indigo-100">
-                                <span className="font-semibold">Latest commit: </span>
-                                <code className="font-mono">{update_status?.latest_hash}</code>
+                            <div className="mt-5 space-y-3">
+                                <button
+                                    onClick={handleUpdate}
+                                    disabled={updating}
+                                    className="w-full py-2.5 px-4 bg-white text-indigo-700 font-bold rounded-xl shadow-sm hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                                >
+                                    {updating ? <Loader2 size={16} className="animate-spin" /> : <DownloadCloud size={16} />}
+                                    {updating ? 'Applying Update...' : 'Apply Update Now'}
+                                </button>
+                                <div className="p-3 rounded-xl bg-white/10 border border-white/20 text-xs text-indigo-100 flex items-center justify-between">
+                                    <span className="font-semibold">Latest commit: </span>
+                                    <code className="font-mono bg-white/20 px-2 py-0.5 rounded">{update_status?.latest_hash}</code>
+                                </div>
                             </div>
                         )}
                     </div>

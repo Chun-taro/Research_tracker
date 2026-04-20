@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
 
         // System Updates & Version Info
         Route::get('system/updates', [\App\Http\Controllers\Admin\SystemController::class, 'updates'])->name('system.updates');
+        Route::post('system/updates/apply', [\App\Http\Controllers\Admin\SystemController::class, 'applyUpdate'])->name('system.updates.apply');
     });
 
     // ------- LANDLORD (CENTRAL SYSTEM) ROUTES -------

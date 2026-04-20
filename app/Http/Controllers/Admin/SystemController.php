@@ -47,4 +47,23 @@ class SystemController extends Controller
             'changelog'      => $changelog,
         ]);
     }
+
+    public function applyUpdate()
+    {
+        try {
+            // Run git pull to fetch the latest codebase from GitHub
+            $output = shell_exec('git pull origin main 2>&1');
+            
+            // Clear the cache manually just in case, to force fresh views
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+
+            if (str_contains($output, 'up to date')) {
+                return back()->with('success', 'System is already up to date.');
+            }
+
+            return back()->with('success', 'Update applied successfully! Output: ' . substr($output, 0, 100) . '...');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to apply update: ' . $e->getMessage());
+        }
+    }
 }
