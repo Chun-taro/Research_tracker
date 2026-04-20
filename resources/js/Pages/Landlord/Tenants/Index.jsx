@@ -6,7 +6,9 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 function TenantModal({ tenant, plans, onClose }) {
-    const { data, setData, post, patch, processing, errors } = useForm({
+    const [provisionAdmin, setProvisionAdmin] = useState(!tenant);
+
+    const { data, setData, post, patch, processing, errors, transform } = useForm({
         name: tenant?.name ?? '',
         institution_name: tenant?.institution_name ?? '',
         slug: tenant?.slug ?? '',
@@ -16,6 +18,18 @@ function TenantModal({ tenant, plans, onClose }) {
         admin_name: '',
         admin_email: '',
         admin_password: tenant ? '' : 'password',
+    });
+
+    transform((data) => {
+        if (!provisionAdmin) {
+            return {
+                ...data,
+                admin_name: '',
+                admin_email: '',
+                admin_password: '',
+            };
+        }
+        return data;
     });
 
     const handleSubmit = (e) => {
@@ -29,12 +43,12 @@ function TenantModal({ tenant, plans, onClose }) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0">
                     <h2 className="text-lg font-semibold text-slate-900">{tenant ? 'Edit Tenant' : 'Configure New Tenant'}</h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={20} /></button>
                 </div>
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Tenant Name (e.g. BSIT)</label>
                         <input type="text" value={data.name} onChange={e => setData('name', e.target.value)}
@@ -82,33 +96,45 @@ function TenantModal({ tenant, plans, onClose }) {
                     </div>
 
                     <div className="pt-4 border-t border-slate-100 mt-4 space-y-4">
-                        <h3 className="text-sm font-bold text-slate-900 border-l-4 border-indigo-500 pl-3">
-                            {tenant ? 'Provision Additional Admin' : 'Initial Admin Account'}
-                        </h3>
-                        {tenant && <p className="text-[10px] text-slate-500 italic">Optional: Only fill these if you need to create a new administrator for this tenant.</p>}
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Admin Name</label>
-                            <input type="text" value={data.admin_name} onChange={e => setData('admin_name', e.target.value)}
-                                placeholder="e.g. Dr. John Smith"
-                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
-                            {errors.admin_name && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_name}</p>}
+                        <div className="flex items-center gap-2 mb-2">
+                             <input type="checkbox" id="provision-check" 
+                                checked={provisionAdmin} 
+                                onChange={e => setProvisionAdmin(e.target.checked)}
+                                disabled={!tenant}
+                                className="rounded text-indigo-600 focus:ring-indigo-500 disabled:opacity-50" />
+                             <label htmlFor="provision-check" className="text-sm font-bold text-slate-900">
+                                {tenant ? 'Provision Additional Admin Account' : 'Create Initial Admin Account (Required)'}
+                             </label>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Email</label>
-                                <input type="email" value={data.admin_email} onChange={e => setData('admin_email', e.target.value)}
-                                    placeholder="admin@dept.edu.ph"
-                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
-                                {errors.admin_email && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_email}</p>}
+
+                        {provisionAdmin && (
+                            <div className="space-y-4 pl-6 border-l-2 border-indigo-100 py-1">
+                                {tenant && <p className="text-[10px] text-slate-500 italic">Optional: Only fill these if you need to create a new administrator for this tenant.</p>}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Admin Name</label>
+                                    <input type="text" value={data.admin_name} onChange={e => setData('admin_name', e.target.value)}
+                                        placeholder="e.g. Dr. John Smith"
+                                        className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
+                                    {errors.admin_name && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_name}</p>}
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Admin Email</label>
+                                        <input type="email" value={data.admin_email} onChange={e => setData('admin_email', e.target.value)}
+                                            placeholder="admin@dept.edu.ph"
+                                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
+                                        {errors.admin_email && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_email}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Admin Password</label>
+                                        <input type="password" value={data.admin_password} onChange={e => setData('admin_password', e.target.value)}
+                                            placeholder="••••••••"
+                                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
+                                        {errors.admin_password && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_password}</p>}
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Admin Password</label>
-                                <input type="password" value={data.admin_password} onChange={e => setData('admin_password', e.target.value)}
-                                    placeholder="••••••••"
-                                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 bg-indigo-50/30 outline-none" required={!tenant} />
-                                {errors.admin_password && <p className="text-xs text-red-500 mt-1 font-bold">{errors.admin_password}</p>}
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {tenant && (
