@@ -16,8 +16,8 @@ Before you start, ensure you have the following installed on your new computer:
 ### 1. Clone the Repository
 Open your terminal/command prompt and pull the code from GitHub:
 ```bash
-git clone https://github.com/your-username/research_tracker.git
-cd research_tracker
+git clone https://github.com/Chun-taro/Research_tracker.git
+cd Research_tracker
 ```
 
 ### 2. Install Dependencies
@@ -49,9 +49,9 @@ DB_PASSWORD=
 TENANT_DB_USERNAME=root
 TENANT_DB_PASSWORD=
 
-# Stripe Configuration (Used for Mock Subscriptions locally)
-STRIPE_KEY=sk_test_dummy
-STRIPE_SECRET=sk_test_dummy
+# GitHub API Token (Optional: for fetching release notes in System History)
+GITHUB_TOKEN=your_github_token_here
+GITHUB_REPO=Chun-taro/Research_tracker
 ```
 
 ### 4. Create the Central Database
