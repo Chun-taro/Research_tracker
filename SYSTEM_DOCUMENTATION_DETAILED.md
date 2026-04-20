@@ -1,5 +1,5 @@
 # 📘 System Documentation: Research Tracker SaaS Platform
-**Version 1.1** | **Last Updated: April 5, 2026**
+**Version v1.1.0** | **Last Updated: April 2026**
 
 ---
 
@@ -43,17 +43,19 @@ The platform utilizes a **Multi-Database Tenancy 모델**, which is the gold sta
 ## 4. Scope and Limitations
 ### Scope:
 - **Institutional Onboarding**: Automated database provisioning for new portal signups.
-- **Subscription Cycles**: Annual billing with automated plan restrictions.
+- **Centralized Identity Hub (SSO)**: Global user identities span across all tenants.
+- **Subscription Cycles**: Annual billing with automated plan restrictions and dynamic UI theming per tier.
+- **System Versioning & Update Tracking**: Real-time integration with GitHub Releases API to track application updates.
 - **Research Lifecycle Management**:
     - Title Proposal & Approval
     - Chapter-by-Chapter Submission & Review
     - Final Manuscript Submission
-    - Panelist Defense Scheduling
+    - Resource Management (Templates & Repositories)
+    - Milestone Scheduling
 - **Versioning Engine**: Support for multiple file revisions with "Revert-to-Previous" functionality.
 
 ### Limitations:
 - **File Types**: Currently optimized for PDF, DOCX, and XLSX formats.
-- **Dependency**: Requires a modern web browser and stable internet connection.
 - **Local Testing**: Requires wildcard subdomain support (e.g., `*.localhost`) for full domain-based testing.
 
 ---
@@ -114,6 +116,13 @@ The system uses a **Copy-Forward** mechanism.
 - Administrators can set specific deadlines for Proposals, Chapters, and Finals.
 - The system prevents late submissions and alerts advisers to pending reviews.
 
+### 🔔 System Update Tracking
+- **Live Versioning**: The central app pings the GitHub Releases API (falling back to local git tags) to grab the currently installed software version.
+- **Notifications**: Admin users are alerted in-app whenever the central repository pushes a new release.
+
+### 🎫 Interactive Support System
+- Cross-tenant support ticketing allows tenants to report bugs/issues directly to the central Landlord dashboard, bridging the gap between developers and clients.
+
 ---
 
 ## 9. User Roles and Permissions (RBAC)
@@ -160,8 +169,78 @@ The system uses a **Copy-Forward** mechanism.
 
 ---
 
-## 14. Development & Deployment
-- **Local Dev**: Laragon/XAMPP with Virtual Hosts enabled for `*.localhost`.
-- **Packaging**: `composer` for backend dependencies, `npm` for frontend.
-- **Database**: 1 Central DB + N Tenant DBs.
-- **Deployment**: Best suited for VPS/Dedicated servers where wildcard DNS can be configured.
+## 14. How to Run This System (Local Development)
+
+### 📋 Prerequisites
+- **PHP 8.2+** 
+- **Composer**
+- **Node.js (v18+)** & npm
+- **MySQL** (via XAMPP, Laragon, or standalone)
+- **Git**
+
+### 💻 Step-by-Step Installation
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Chun-taro/Research_tracker.git
+   cd Research_tracker
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Environment Configuration**
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and set the following critical database connections:
+   ```ini
+   APP_URL=http://localhost:8000
+   SESSION_DOMAIN=.localhost
+
+   # Landlord Database Connection
+   DB_CONNECTION=landlord
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=research_tracker_landlord
+   DB_USERNAME=root
+   DB_PASSWORD=
+
+   # Tenant Global Credentials (Used dynamically to construct/access tenant databases)
+   TENANT_DB_USERNAME=root
+   TENANT_DB_PASSWORD=
+   ```
+
+4. **Create the Central Database**
+   Before running migrations, you must create the central `landlord` database manually in your MySQL client (e.g., phpMyAdmin):
+   ```sql
+   CREATE DATABASE research_tracker_landlord;
+   ```
+   *(Note: Do not create the tenant databases manually. The system provisions them dynamically when an admin creates a new portal).*
+
+5. **Generate Key, Migrate, and Seed**
+   ```bash
+   php artisan key:generate
+   php artisan migrate --database=landlord --path=database/migrations/landlord
+   php artisan db:seed
+   ```
+
+6. **Serve the Application**
+   You need two terminal windows running simultaneously:
+
+   **Terminal 1 (Backend Server):**
+   ```bash
+   php artisan serve
+   ```
+   
+   **Terminal 2 (Frontend Assets & Hot Reloading):**
+   ```bash
+   npm run dev
+   ```
+
+### 🌐 Accessing the System
+- **Landlord Access (SaaS Admin):** Navigate to `http://localhost:8000` (or `http://admin.localhost:8000`). Default login connects to the Master SuperAdmin account.
+- **Tenant Portals:** When you create a tenant (e.g., `slug = bsit`), the app dynamically spins up a database and access portal at `http://bsit.localhost:8000`. Use the admin credentials you assigned to that portal to log in.

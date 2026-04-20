@@ -11,9 +11,10 @@ This report compares your current **Research Tracker** implementation against th
 | **3. Tenant Identification** | ✅ **Full Match** | Supports both **Domain-based** (`sub.domain.com`) and **Slug-based** (`slug.localhost`) identification. |
 | **4. RBAC** | ✅ **Full Match** | Implements custom roles: `Student`, `Adviser`, `Panelist`, and `Admin` with per-tenant isolation. |
 | **5. Pricing Model** | ✅ **Full Match** | Includes `Basic`, `Standard`, and `Premium` tiers with enforced restrictions (e.g., group limits). |
-| **6. Automatic Updates** | ✅ **Full Match** | Being a "One App" system, code updates in the central repository propagate to all tenants simultaneously. |
-| **7. Security Implementation** | ✅ **Full Match** | Built on Laravel’s robust security stack (Auth, CSRF, SQL Injection protection). |
+| **6. Automatic Updates** | ✅ **Full Match** | A "One App" system where code updates in the central repository propagate to all tenants. Also integrates with GitHub Releases API for real-time version tracking in-app. |
+| **7. Security & Identity** | ✅ **Full Match** | Includes a Centralized Identity Hub (SSO) bridging multiple tenants securely, plus standard robust Laravel protections (Auth, CSRF, SQLi). |
 | **8. Data Encapsulation** | ✅ **Full Match** | Multi-database architecture provides the highest level of physical data separation. |
+| **9. Centralized Support** | ✅ **Full Match** | Tenants have a built-in Support system to file tickets directly to the SaaS landlord. |
 
 ---
 
@@ -34,8 +35,13 @@ This report compares your current **Research Tracker** implementation against th
 ### 4. RBAC (Role-Based Access Control)
 - The system doesn't just have generic users; it has specific roles for the research process (`Adviser`, `Panelist`, `Student`), and permissions are scoped to the tenant database.
 
-### 5. Automatic Updates
-- Since you are using a centralized codebase with different databases, any change pushed to the `main` branch (like our recent UI updates) is immediately available to all tenants once deployed. Database schema updates are managed through centralized `tenants:migrate` commands.
+### 5. Automatic Updates & Versioning
+- **Deployment**: Since you are using a centralized codebase with different databases, any change pushed to the `main` branch is immediately available to all tenants.
+- **In-App Tracking**: The system pings the GitHub Releases API (and falls back to local git tools) to dynamically fetch the latest system version and display full commit logs directly within the Landlord and Tenant admin dashboards.
+
+### 6. Centralized Features
+- **Identity Hub (SSO)**: The landlord controls user provisioning centrally via the `landlord` database, bypassing complex localized hashing rules.
+- **Support Ticketing**: Tenants have a direct support channel inside the app that talks directly to the landlord's global monitoring console.
 
 ---
 
