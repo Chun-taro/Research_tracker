@@ -1,27 +1,34 @@
 # Research Tracker (Multi-Tenant Architecture)
 
-This is a comprehensive multi-tenant research tracking application rebuilt with Laravel 12, Inertia.js, and React. It features a central Landlord system to manage isolated Tenant (Portal) databases, handles multi-role workflows (Student, Adviser, Panelist, Admin), and includes automated subscription billing via Stripe.
+This is a comprehensive multi-tenant research tracking application built with **Laravel 12**, **Inertia.js**, and **React**. 
+
+### 🏗 Architecture Overview
+The system uses a **Landlord/Tenant** architecture:
+- **Landlord Database (`research_tracker`)**: Stores central information like subscription plans, tenant records, and global super-admins.
+- **Tenant Databases (Dynamic)**: Each research institution or department (e.g., `research_tracker_bsit`) gets its own isolated database for its users, groups, and research data.
+
+---
 
 ## 📋 Prerequisites
 
-Before you start, ensure you have the following installed on your new computer:
-- **PHP 8.2+** 
+Before you start, ensure you have the following installed:
+- **PHP 8.2+**
 - **Composer**
-- **Node.js (v18+)** & npm
+- **Node.js (v18+) & npm**
 - **MySQL** (via XAMPP, Laragon, or standalone)
 - **Git**
+
+---
 
 ## 💻 Installation Guide
 
 ### 1. Clone the Repository
-Open your terminal/command prompt and pull the code from GitHub:
 ```bash
 git clone https://github.com/Chun-taro/Research_tracker.git
 cd Research_tracker
 ```
 
 ### 2. Install Dependencies
-Install the PHP packages and Node modules:
 ```bash
 composer install
 npm install
@@ -33,47 +40,56 @@ Duplicate the example environment file:
 cp .env.example .env
 ```
 Open the `.env` file and verify these critical settings:
-```ini
-APP_URL=http://localhost:8000
-SESSION_DOMAIN=.localhost
 
-# Landlord Database Connection
+#### Landlord Connection (The Central System)
+```ini
 DB_CONNECTION=landlord
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=research_tracker
 DB_USERNAME=root
 DB_PASSWORD=
-
-# Tenant Database Config (Credentials used dynamically)
-TENANT_DB_USERNAME=root
-TENANT_DB_PASSWORD=
-
-# GitHub API Token (Optional: for fetching release notes in System History)
-GITHUB_TOKEN=your_github_token_here
-GITHUB_REPO=Chun-taro/Research_tracker
 ```
 
-### 4. Create the Central Database
-Before running migrations, you must legally create the central Landlord database. Open your MySQL client (e.g., phpMyAdmin, TablePlus) and execute:
+#### Multi-Tenancy & Domains
+```ini
+# This allows subdomains to share the session (e.g., bsit.localhost)
+SESSION_DOMAIN=.localhost
+APP_URL=http://localhost:8000
+
+# Tenant Database Credentials (The system uses these to create new DBs)
+TENANT_DB_USERNAME=root
+TENANT_DB_PASSWORD=
+```
+
+### 4. Database Initialization (CRITICAL STEP)
+The multi-tenant structure requires a specific migration sequence.
+
+**A. Create the Central Database:**
+Open your MySQL client (e.g., phpMyAdmin, TablePlus) and create the main database:
 ```sql
 CREATE DATABASE research_tracker;
 ```
-*(Note: Do not create the tenant databases manually! The system handles that automatically).*
 
-### 5. Generate Key, Migrate, and Seed
-Run these commands to prepare your software:
+**B. Generate App Key:**
 ```bash
-# Generate App encryption key
 php artisan key:generate
+```
 
-# Run migrating and seeding for the Landlord database
+**C. Run Landlord Migrations:**
+Since migrations are separated, you must specify the path and database for the landlord:
+```bash
 php artisan migrate --database=landlord --path=database/migrations/landlord
+```
+
+**D. Seed the System:**
+This command seeds the landlord data AND automatically creates the first sample tenant database (`research_tracker_bsit`):
+```bash
 php artisan db:seed
 ```
 
-### 6. Run the Application
-You will need two separate terminal windows to run both the Laravel backend and the Vite frontend server:
+### 5. Run the Application
+You need two separate terminal windows:
 
 **Terminal 1 (Backend):**
 ```bash
@@ -89,17 +105,33 @@ npm run dev
 
 ## 🚀 Accessing the System
 
-Everything is driven by subdomains. Because `SESSION_DOMAIN=.localhost` is set, you can navigate locally to different branches.
+The application uses subdomains to distinguish between the central admin and specific tenants.
 
-### 🌐 Accessing the System
-- **Landlord Access (SaaS Admin):** Navigate to `http://localhost:8000` (or `http://admin.localhost:8000`). 
+- **Landlord Access (SaaS Admin):** [http://localhost:8000](http://localhost:8000)
   - **Email:** `superadmin@researchtracker.com`
   - **Password:** `password`
-- **Tenant Portals:** When you create a tenant (e.g., `slug = bsit`), the app dynamically spins up a database and access portal at `http://bsit.localhost:8000`. Use the admin credentials you assigned to that portal to log in.
+- **Tenant Portal (Sample):** [http://bsit.localhost:8000](http://bsit.localhost:8000)
+  - **Email:** `admin@bsit.edu.ph`
+  - **Password:** `password`
 
 ---
 
 ## 🛠 Troubleshooting
-- **Routing/Domain issues**: If `bsit.localhost` doesn't resolve on your Windows machine, ensure your browser caches are cleared, or temporarily use Chrome/Brave which resolves `.localhost` loopbacks automatically.
-- **Vite Manifest Error**: Ensure you ran `npm install` and that `npm run dev` is actively running in a terminal, OR run `npm run build` to compile static assets.
-- **SQL "Unknown Database" Error**: Ensure you explicitly executed `CREATE DATABASE research_tracker;` before running `php artisan migrate`.
+
+### ❌ "Table 'research_tracker.tenants' doesn't exist"
+This happens if you ran `php artisan migrate` without the `--path` flag. The default migration folder is empty.
+**Fix:** Run the specific landlord migration command:
+```bash
+php artisan migrate --database=landlord --path=database/migrations/landlord
+```
+
+### ❌ Subdomain (bsit.localhost) not loading
+- Ensure `SESSION_DOMAIN=.localhost` (with the leading dot) is set in `.env`.
+- Use **Google Chrome** or **Brave**, as they automatically resolve `*.localhost` to your local machine.
+
+### ❌ "Unknown Database 'research_tracker_bsit'"
+This happens if the seeder failed or was skipped.
+**Fix:** Run `php artisan db:seed`. This command is programmed to create the tenant databases for you.
+
+### ❌ Vite Manifest Error
+Ensure `npm run dev` is actively running in a terminal, or run `npm run build` for a production-ready version.
