@@ -31,14 +31,24 @@ class SystemUpdateService
         $currentHash = $this->getCurrentVersion();
         $cachedHash = Cache::get('system_last_known_hash');
         
-        if ($cachedHash && $currentHash !== 'unknown' && $currentHash !== $cachedHash) {
-            // Codebase changed! Bust the versioning and update caches instantly.
+        // Also check the raw local tag to detect tag-only changes
+        $currentTag = $this->getRawLocalTag();
+        $cachedTag = Cache::get('system_last_known_tag');
+        
+        $hashChanged = ($cachedHash && $currentHash !== 'unknown' && $currentHash !== $cachedHash);
+        $tagChanged = ($cachedTag && $currentTag !== 'unknown' && $currentTag !== $cachedTag);
+
+        if ($hashChanged || $tagChanged) {
+            // Codebase or Tags changed! Bust the versioning and update caches instantly.
             Cache::forget('app_version_tag');
             Cache::forget('github_update_check');
         }
         
         if ($currentHash !== 'unknown') {
             Cache::put('system_last_known_hash', $currentHash);
+        }
+        if ($currentTag !== 'unknown') {
+            Cache::put('system_last_known_tag', $currentTag);
         }
     }
 
@@ -52,6 +62,22 @@ class SystemUpdateService
         } catch (\Exception $e) {
             return 'unknown';
         }
+    }
+
+    /**
+     * Get the raw local tag without caching.
+     */
+    protected function getRawLocalTag()
+    {
+        try {
+            $tag = trim(shell_exec('git describe --tags --abbrev=0 2>&1'));
+            if ($tag && !str_contains($tag, 'fatal') && !str_contains($tag, 'No names')) {
+                return $tag;
+            }
+        } catch (\Exception $e) {
+            // fall through
+        }
+        return 'unknown';
     }
 
     /**
