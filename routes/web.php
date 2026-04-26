@@ -82,9 +82,6 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::get('billing/success', [\App\Http\Controllers\TenantSubscriptionController::class, 'success'])->name('billing.success');
         Route::get('billing/cancel', [\App\Http\Controllers\TenantSubscriptionController::class, 'cancel'])->name('billing.cancel');
 
-        // Support & Bug Reporting
-        Route::get('support', [SupportController::class, 'index'])->name('support.index');
-        Route::post('support', [SupportController::class, 'store'])->name('support.store');
 
         // System Updates & Version Info
         Route::get('system/updates', [\App\Http\Controllers\Admin\SystemController::class, 'updates'])->name('system.updates');
@@ -162,7 +159,10 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::get('repository', [RepositoryController::class, 'index'])->name('repository.index');
         Route::get('repository/{repository}/download', [RepositoryController::class, 'download'])->name('repository.download');
         Route::get('schedules', [ScheduleController::class, 'studentIndex'])->name('schedules.index');
-    });
+
+    // Shared Support Routes (accessible by all roles)
+    Route::get('support', [SupportController::class, 'index'])->name('support.index');
+    Route::post('support', [SupportController::class, 'store'])->name('support.store');
 });
 
 require __DIR__.'/auth.php';

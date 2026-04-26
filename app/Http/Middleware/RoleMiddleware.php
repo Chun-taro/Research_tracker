@@ -14,8 +14,11 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        if (!in_array($request->user()->role, $roles)) {
-            abort(403, 'Unauthorized action.');
+        $userRole = strtolower($request->user()->role ?? '');
+        $allowedRoles = array_map('strtolower', $roles);
+
+        if (!in_array($userRole, $allowedRoles)) {
+            abort(403, 'Unauthorized action. Required role: ' . implode(', ', $roles));
         }
 
         return $next($request);

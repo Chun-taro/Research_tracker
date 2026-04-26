@@ -20,7 +20,7 @@ const roleNavItems = {
         { label: 'Reports', href: '/admin/reports', icon: BarChart2 },
         { label: 'Settings', href: '/admin/settings', icon: Settings },
         { label: 'Billing & Plan', href: '/admin/billing', icon: CreditCard },
-        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
+        { label: 'Support', href: '/support', icon: LifeBuoy },
         { label: 'System Updates', href: '/admin/system/updates', icon: Zap },
     ],
     adviser: [
@@ -30,13 +30,13 @@ const roleNavItems = {
         { label: 'Schedules', href: '/adviser/schedules', icon: Calendar },
         { label: 'Templates', href: '/adviser/templates', icon: Upload },
         { label: 'Repository', href: '/adviser/repository', icon: Database },
-        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
+        { label: 'Support', href: '/support', icon: LifeBuoy },
     ],
     panelist: [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { label: 'Assignments', href: '/panelist/assignments', icon: GraduationCap },
         { label: 'Schedules', href: '/panelist/schedules', icon: Calendar },
-        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
+        { label: 'Support', href: '/support', icon: LifeBuoy },
     ],
     student: [
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -45,7 +45,7 @@ const roleNavItems = {
         { label: 'Templates', href: '/student/templates', icon: Upload },
         { label: 'Repository', href: '/student/repository', icon: Database },
         { label: 'Schedules', href: '/student/schedules', icon: Calendar },
-        { label: 'Support', href: '/admin/support', icon: LifeBuoy },
+        { label: 'Support', href: '/support', icon: LifeBuoy },
     ],
 };
 
@@ -54,7 +54,7 @@ export default function AuthenticatedLayout({ children }) {
     const user = auth?.user;
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
-    const navItems = roleNavItems[user?.role] ?? roleNavItems.student;
+    const navItems = roleNavItems[user?.role?.toLowerCase()] ?? roleNavItems.student;
     const themeColor = tenant?.theme_color ?? '#3B82F6';
 
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';
