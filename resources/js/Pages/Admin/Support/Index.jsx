@@ -19,7 +19,7 @@ export default function Index({ tickets }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('admin.support.store'), {
+        post(route('support.store'), {
             onSuccess: () => {
                 reset();
                 setIsSubmitting(false);
