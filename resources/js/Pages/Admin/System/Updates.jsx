@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/Components/PageHeader';
 import {
     LifeBuoy, Zap, Clock, ShieldCheck, Mail, MessageSquare,
-    BookOpen, ExternalLink, CheckCircle, AlertTriangle, GitCommit, Tag, DownloadCloud, Loader2
+    BookOpen, ExternalLink, CheckCircle, AlertTriangle, GitCommit, Tag, DownloadCloud, Loader2, RotateCcw
 } from 'lucide-react';
 
 const TYPE_CONFIG = {
@@ -24,12 +24,25 @@ export default function Updates({ system_version, update_status = {}, changelog 
     const updateAvailable = update_status?.update_available ?? false;
 
     const [updating, setUpdating] = useState(false);
+    const [rollingBack, setRollingBack] = useState(null);
 
     const handleUpdate = () => {
         setUpdating(true);
         router.post(route('admin.system.updates.apply'), {}, {
             preserveScroll: true,
             onFinish: () => setUpdating(false),
+        });
+    };
+
+    const handleRollback = (sha) => {
+        if (!window.confirm(`Are you sure you want to rollback the system to commit ${sha}? This will reset all local code changes.`)) {
+            return;
+        }
+
+        setRollingBack(sha);
+        router.post(route('admin.system.updates.rollback'), { sha }, {
+            preserveScroll: true,
+            onFinish: () => setRollingBack(null),
         });
     };
 
@@ -201,6 +214,16 @@ export default function Updates({ system_version, update_status = {}, changelog 
                                                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700">
                                                                 ✓ Current
                                                             </span>
+                                                        )}
+                                                        {!item.is_current && (
+                                                            <button
+                                                                onClick={() => handleRollback(item.sha)}
+                                                                disabled={rollingBack === item.sha}
+                                                                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200 transition-colors disabled:opacity-50"
+                                                            >
+                                                                {rollingBack === item.sha ? <Loader2 size={10} className="animate-spin" /> : <RotateCcw size={10} />}
+                                                                Rollback to here
+                                                            </button>
                                                         )}
                                                         <span className="text-xs text-gray-400 ml-auto">{item.date}</span>
                                                     </div>

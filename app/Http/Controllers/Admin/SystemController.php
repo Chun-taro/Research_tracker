@@ -73,4 +73,32 @@ class SystemController extends Controller
             return back()->with('error', 'Failed to apply update: ' . $e->getMessage());
         }
     }
+
+    public function rollback(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'sha' => 'required|string',
+        ]);
+
+        try {
+            $sha = $request->sha;
+
+            // 1. Hard reset to the specific SHA
+            shell_exec("git reset --hard {$sha} 2>&1");
+
+            // 2. Run Landlord Migrations
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--database' => 'landlord',
+                '--path' => 'database/migrations/landlord',
+                '--force' => true
+            ]);
+
+            // 3. Clear cache
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+
+            return back()->with('success', "System rolled back to {$sha} successfully!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to rollback: ' . $e->getMessage());
+        }
+    }
 }

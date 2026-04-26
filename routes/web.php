@@ -89,6 +89,7 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         // System Updates & Version Info
         Route::get('system/updates', [\App\Http\Controllers\Admin\SystemController::class, 'updates'])->name('system.updates');
         Route::post('system/updates/apply', [\App\Http\Controllers\Admin\SystemController::class, 'applyUpdate'])->name('system.updates.apply');
+        Route::post('system/updates/rollback', [\App\Http\Controllers\Admin\SystemController::class, 'rollback'])->name('system.updates.rollback');
     });
 
     // ------- LANDLORD (CENTRAL SYSTEM) ROUTES -------
@@ -117,6 +118,9 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         // Support Tickets Management
         Route::get('/tickets', [\App\Http\Controllers\Landlord\SupportController::class, 'index'])->name('tickets.index');
         Route::patch('/tickets/{ticket}', [\App\Http\Controllers\Landlord\SupportController::class, 'update'])->name('tickets.update');
+
+        // Rollback
+        Route::post('/system/rollback', [\App\Http\Controllers\Landlord\DashboardController::class, 'rollback'])->name('system-rollback');
     });
 
     // ------- ADVISER ROUTES -------

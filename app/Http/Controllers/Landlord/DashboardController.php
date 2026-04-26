@@ -53,4 +53,32 @@ class DashboardController extends Controller
             'fullHistory' => $updateService->getHistory(30), // Get more items for the dedicated page
         ]);
     }
+
+    public function rollback(Request $request)
+    {
+        $request->validate([
+            'sha' => 'required|string',
+        ]);
+
+        try {
+            $sha = $request->sha;
+
+            // 1. Hard reset to the specific SHA
+            shell_exec("git reset --hard {$sha} 2>&1");
+
+            // 2. Run Landlord Migrations
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--database' => 'landlord',
+                '--path' => 'database/migrations/landlord',
+                '--force' => true
+            ]);
+
+            // 3. Clear cache
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+
+            return back()->with('success', "System core successfully rolled back to {$sha}.");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Critical error during rollback: ' . $e->getMessage());
+        }
+    }
 }
