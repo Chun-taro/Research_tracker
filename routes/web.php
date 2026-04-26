@@ -159,6 +159,7 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::get('repository', [RepositoryController::class, 'index'])->name('repository.index');
         Route::get('repository/{repository}/download', [RepositoryController::class, 'download'])->name('repository.download');
         Route::get('schedules', [ScheduleController::class, 'studentIndex'])->name('schedules.index');
+    });
 
     // Shared Support Routes (accessible by all roles)
     Route::get('support', [SupportController::class, 'index'])->name('support.index');
