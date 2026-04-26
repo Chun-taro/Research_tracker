@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Ongoing refinements to the multi-tenant research tracking engine.
+
+## [v1.3.0] - 2026-04-26
+
+### Added
+- **Detailed Multi-tenant Setup Guide** — README updated with step-by-step instructions for installing and configuring the landlord and tenant environments.
+
+### Fixed
+- **UI Cleanup** — Removed redundant mock subscription buttons from the Tenant Index for a cleaner administrative experience.
+
+## [v1.2.2] - 2026-04-24
+
+### Fixed
+- **Ziggy Route Resolution** — Fixed a critical error where landlord/tenant route naming conflicts prevented the Ziggy route list from generating correctly in the frontend.
+
+## [v1.2.1] - 2026-04-24
+
+### Fixed
+- **Schema Automation** — Ensured `institution_name` is correctly included in the core schema and that migrations run automatically during the 1-click update process.
+
+## [v1.2.0] - 2026-04-24
+
+### Added
+- **1-Click System Updates** — Introduced a button in the Admin UI to automatically pull the latest code from GitHub and run necessary migrations.
+- **Smart Cache Invalidation** — Added automatic clearing of versioning and system caches whenever a local git change (pull/commit) is detected.
+
+### Fixed
+- **Tenant Management UI** — Made the tenant creation modal scrollable and added a toggle to hide/disable the admin provisioning form.
+- **Migration Structure** — Moved core landlord migrations to the dedicated `landlord` directory to align with multitenancy command standards.
+- **Missing Columns** — Fixed a bug where the `institution_name` column was missing from the initial tenants table migration.
+
+## [v1.1.0] - 2026-04-23
+
+### Added
+- **Superadmin Credentials** — Documentation now explicitly lists the default superadmin credentials to assist with initial setup of cloned repositories.
 
 ## [v1.0.0] - 2026-04-19
 
@@ -66,5 +101,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/Chun-taro/Research_tracker/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Chun-taro/Research_tracker/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/Chun-taro/Research_tracker/compare/v1.2.2...v1.3.0
+[v1.2.2]: https://github.com/Chun-taro/Research_tracker/compare/v1.2.1...v1.2.2
+[v1.2.1]: https://github.com/Chun-taro/Research_tracker/compare/v1.2.0...v1.2.1
+[v1.2.0]: https://github.com/Chun-taro/Research_tracker/compare/v1.1.0...v1.2.0
+[v1.1.0]: https://github.com/Chun-taro/Research_tracker/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/Chun-taro/Research_tracker/releases/tag/v1.0.0
