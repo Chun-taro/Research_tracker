@@ -42,7 +42,7 @@ class RepositoryController extends Controller
         $data = $request->validate([
             'research_group_id' => [
                 'required',
-                \Illuminate\Validation\Rule::exists('research_groups', 'id')->where('tenant_id', $tenantId)
+                \Illuminate\Validation\Rule::exists(\App\Models\ResearchGroup::class, 'id')->where('tenant_id', $tenantId)
             ],
             'title' => 'required|string|max:255',
             'abstract' => 'required|string',

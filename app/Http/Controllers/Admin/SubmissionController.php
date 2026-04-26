@@ -33,7 +33,7 @@ class SubmissionController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'research_group_id' => 'required|exists:research_groups,id',
+            'research_group_id' => 'required|exists:App\Models\ResearchGroup,id',
             'type' => 'required|in:title_proposal,chapter,final_manuscript,defense_requirements',
             'file' => 'required|file|mimes:pdf,docx,doc,xlsx,zip|max:51200',
             'remarks' => 'nullable|string',

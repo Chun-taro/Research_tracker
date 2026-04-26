@@ -29,7 +29,7 @@ class ScheduleController extends Controller
         $data = $request->validate([
             'research_group_id' => [
                 'required',
-                \Illuminate\Validation\Rule::exists('research_groups', 'id')->where('tenant_id', $tenantId)
+                \Illuminate\Validation\Rule::exists(\App\Models\ResearchGroup::class, 'id')->where('tenant_id', $tenantId)
             ],
             'type' => 'required|in:proposal_defense,final_defense,consultation',
             'scheduled_at' => 'required|date|after:now',

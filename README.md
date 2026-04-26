@@ -76,13 +76,13 @@ CREATE DATABASE research_tracker;
 php artisan key:generate
 ```
 
-**C. Run Landlord Migrations:**
-Since migrations are separated, you must specify the path and database for the landlord:
+**D. Run Tenant Migrations (Workaround for Cross-DB Validation):**
+To ensure that validation rules (like `exists:research_groups,id`) work across connections, run the tenant schema on the landlord database:
 ```bash
-php artisan migrate --database=landlord --path=database/migrations/landlord
+php artisan migrate --database=landlord --path=database/migrations/tenant
 ```
 
-**D. Seed the System:**
+**E. Seed the System:**
 This command seeds the landlord data AND automatically creates the first sample tenant database (`research_tracker_bsit`):
 ```bash
 php artisan db:seed
@@ -117,6 +117,17 @@ The application uses subdomains to distinguish between the central admin and spe
 ---
 
 ## 🛠 Troubleshooting
+
+### ❌ "Table 'research_tracker.research_groups' doesn't exist"
+This happens if you haven't run the tenant migrations on the landlord connection. Some validation rules require the table schema to be present in the default connection.
+**Fix:** 
+```bash
+php artisan migrate --database=landlord --path=database/migrations/tenant
+```
+
+### ❌ "Integrity constraint violation (support_tickets_user_id_foreign)"
+This was a known issue in older versions where support tickets in the central DB were trying to enforce foreign keys on tenant-specific users.
+**Fix:** Pull the latest version and run migrations. The foreign key has been relaxed to support multi-database users.
 
 ### ❌ "Table 'research_tracker.tenants' doesn't exist"
 This happens if you ran `php artisan migrate` without the `--path` flag. The default migration folder is empty.

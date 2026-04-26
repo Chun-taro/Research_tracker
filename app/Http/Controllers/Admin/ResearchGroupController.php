@@ -125,7 +125,7 @@ class ResearchGroupController extends Controller
             'research_cycle_id' => [
                 'required',
                 // Explicitly check the 'mysql' connection which is the tenant's DB
-                \Illuminate\Validation\Rule::exists('mysql.research_cycles', 'id')->where('tenant_id', $tenantId),
+                \Illuminate\Validation\Rule::exists(\App\Models\ResearchCycle::class, 'id')->where('tenant_id', $tenantId),
             ],
         ]);
 
@@ -148,7 +148,7 @@ class ResearchGroupController extends Controller
 
     public function joinGroup(Request $request)
     {
-        $request->validate(['group_code' => 'required|exists:research_groups,id']);
+        $request->validate(['group_code' => 'required|exists:App\Models\ResearchGroup,id']);
 
         \App\Models\GroupMember::create([
             'tenant_id' => $request->user()->tenant_id,
