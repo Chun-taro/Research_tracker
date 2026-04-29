@@ -14,16 +14,19 @@ while ($true) {
     $CurrentTime = Get-Date -Format "HH:mm:ss"
     Write-Host "[$CurrentTime] Checking GitHub for changes..." -ForegroundColor Gray
     
-    # Get current hash before pull
+    # Get current hash and tag before pull
     $OldHash = git rev-parse HEAD
+    $OldTag = try { git describe --tags --abbrev=0 2>$null } catch { "none" }
     
-    # Run git pull
+    # Run git pull and fetch tags
     $PullOutput = git pull origin $Branch 2>&1
+    git fetch --tags origin 2>$null
     
-    # Get hash after pull
+    # Get hash and tag after pull
     $NewHash = git rev-parse HEAD
+    $NewTag = try { git describe --tags --abbrev=0 2>$null } catch { "none" }
     
-    if ($OldHash -ne $NewHash) {
+    if ($OldHash -ne $NewHash -or $OldTag -ne $NewTag) {
         Write-Host "NEW UPDATE DETECTED!" -ForegroundColor Green
         Write-Host "Hash: $OldHash -> $NewHash" -ForegroundColor Yellow
         
