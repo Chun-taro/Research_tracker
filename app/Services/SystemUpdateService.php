@@ -302,4 +302,53 @@ class SystemUpdateService
             throw new \Exception("Failed to publish tag: " . $e->getMessage());
         }
     }
+    /**
+     * Perform the actual update process.
+     */
+    public function performUpdate()
+    {
+        // Increase execution time for heavy tasks
+        set_time_limit(600);
+
+        $results = [];
+
+        try {
+            // 1. Git Pull
+            $results['git'] = shell_exec('git pull origin ' . $this->branch . ' 2>&1');
+            
+            // 2. Composer Install
+            $results['composer'] = shell_exec('composer install --no-interaction --prefer-dist 2>&1');
+
+            // 3. NPM Install & Build
+            $results['npm'] = shell_exec('npm install && npm run build 2>&1');
+
+            // 4. Migrations
+            \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--database' => 'landlord',
+                '--path' => 'database/migrations/landlord',
+                '--force' => true
+            ]);
+            $results['migrate'] = \Illuminate\Support\Facades\Artisan::output();
+
+            // 5. Clear Cache
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+
+            // Bust version cache
+            Cache::forget('app_version_tag');
+            Cache::forget('github_update_check');
+
+            return [
+                'success' => true,
+                'output' => $results,
+            ];
+        } catch (\Exception $e) {
+            \Log::error("SystemUpdateService: Update failed - " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
 }

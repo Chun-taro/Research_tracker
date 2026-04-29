@@ -53,38 +53,15 @@ class SystemController extends Controller
         ]);
     }
 
-    public function applyUpdate()
+    public function applyUpdate(SystemUpdateService $updateService)
     {
-        // Increase execution time for heavy tasks like npm install / build
-        set_time_limit(300);
+        $result = $updateService->performUpdate();
 
-        try {
-            // 1. Run git pull to fetch the latest codebase
-            $output = "GIT: " . shell_exec('git pull origin main 2>&1');
-            
-            // 2. Install PHP dependencies
-            $output .= "\nCOMPOSER: " . shell_exec('composer install --no-interaction --prefer-dist 2>&1');
-
-            // 3. Install NPM dependencies & Build Assets
-            // We combine these to save time and ensure they run in sequence
-            $output .= "\nNPM: " . shell_exec('npm install && npm run build 2>&1');
-
-            // 4. Run Landlord Migrations to ensure DB schema is up-to-date
-            \Illuminate\Support\Facades\Artisan::call('migrate', [
-                '--database' => 'landlord',
-                '--path' => 'database/migrations/landlord',
-                '--force' => true
-            ]);
-
-            // 5. Clear cache to force fresh state
-            \Illuminate\Support\Facades\Artisan::call('cache:clear');
-
-            \Log::info("System Update Log:\n" . $output);
-
+        if ($result['success']) {
+            \Log::info("System Update Successful", $result['output']);
             return back()->with('success', 'System updated, dependencies installed, and assets built successfully!');
-        } catch (\Exception $e) {
-            \Log::error("Update Failed: " . $e->getMessage());
-            return back()->with('error', 'Failed to apply update: ' . $e->getMessage());
+        } else {
+            return back()->with('error', 'Failed to apply update: ' . $result['error']);
         }
     }
 
