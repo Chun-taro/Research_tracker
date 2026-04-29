@@ -1,7 +1,7 @@
 # Research Tracker - Automated Watch & Update Script
 # This script runs in your terminal and keeps your system synced with GitHub.
 
-$Interval = 30 # Seconds between checks
+$Interval = 10 # Seconds between checks
 $Branch = "main"
 
 Write-Host "==============================================" -ForegroundColor Cyan
