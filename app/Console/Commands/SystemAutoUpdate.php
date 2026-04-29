@@ -21,6 +21,13 @@ class SystemAutoUpdate extends Command
                             {--interval=60 : Seconds to wait between checks when watching}';
 
     /**
+     * The console command aliases.
+     *
+     * @var array
+     */
+    protected $aliases = ['system:pull'];
+
+    /**
      * The console command description.
      *
      * @var string
