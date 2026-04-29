@@ -9,7 +9,7 @@ Write-Host "==============================================" -ForegroundColor Cya
 $CurrentTags = git tag -l --sort=-v:refname
 Write-Host "Latest tags:" -ForegroundColor Gray
 Write-Host ($CurrentTags | Select-Object -First 5) -ForegroundColor Gray
-$Version = Read-Host "Enter new version tag (e.g., v1.7.6)"
+$Version = Read-Host "Test Update (e.g., v1.7.7)"
 
 if (-not $Version.StartsWith("v")) {
     $Version = "v" + $Version
