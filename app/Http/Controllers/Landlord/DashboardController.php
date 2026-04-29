@@ -80,5 +80,23 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Critical error during rollback: ' . $e->getMessage());
         }
+    public function publishVersion(Request $request, SystemUpdateService $updateService)
+    {
+        $request->validate([
+            'version' => 'required|string|regex:/^v?\d+\.\d+\.\d+$/',
+        ]);
+
+        try {
+            $tagName = $request->version;
+            if (!str_starts_with($tagName, 'v')) {
+                $tagName = 'v' . $tagName;
+            }
+
+            $updateService->publishTag($tagName);
+
+            return back()->with('success', "New version {$tagName} has been published to GitHub successfully!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to publish version: ' . $e->getMessage());
+        }
     }
 }

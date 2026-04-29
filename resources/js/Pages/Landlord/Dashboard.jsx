@@ -11,6 +11,20 @@ export default function LandlordDashboard({ stats, recentTenants, tierDistributi
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
+    // Form for publishing new versions
+    const { data, setData, post: postVersion, processing, reset, errors } = useForm({
+        version: '',
+    });
+
+    const handlePublish = (e) => {
+        e.preventDefault();
+        if (confirm(`Are you sure you want to publish version ${data.version} to GitHub?`)) {
+            postVersion(route('landlord.system-publish'), {
+                onSuccess: () => reset(),
+            });
+        }
+    };
+
     useEffect(() => {
         if (!chartRef.current) return;
         const load = async () => {
@@ -172,6 +186,54 @@ export default function LandlordDashboard({ stats, recentTenants, tierDistributi
                                 Full GitHub History <TrendingUp size={10} />
                             </a>
                          </div>
+                    </div>
+
+                    {/* Publish New Version Section */}
+                    <div className="mt-6 pt-6 border-t border-slate-100">
+                        <div className="bg-slate-900 rounded-xl p-5 text-white shadow-lg shadow-slate-900/20">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Globe size={18} className="text-blue-400" />
+                                <h3 className="font-bold text-sm tracking-tight">Publish System Update</h3>
+                            </div>
+                            
+                            <p className="text-[11px] text-slate-400 mb-4 leading-relaxed">
+                                Deploy current codebase as a new version. This will tag the commit on GitHub and notify all tenants.
+                            </p>
+
+                            <form onSubmit={handlePublish} className="space-y-3">
+                                <div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="e.g. v1.6.0"
+                                        className={cn(
+                                            "w-full bg-slate-800 border-slate-700 rounded-lg text-xs font-mono py-2 px-3 focus:ring-blue-500 focus:border-blue-500 transition-all",
+                                            errors.version && "border-red-500"
+                                        )}
+                                        value={data.version}
+                                        onChange={e => setData('version', e.target.value)}
+                                        disabled={processing}
+                                    />
+                                    {errors.version && <p className="text-[10px] text-red-400 mt-1">{errors.version}</p>}
+                                </div>
+                                <button 
+                                    type="submit"
+                                    disabled={processing || !data.version}
+                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white text-xs font-bold py-2.5 rounded-lg transition-all shadow-md shadow-blue-900/20 flex items-center justify-center gap-2"
+                                >
+                                    {processing ? (
+                                        <span className="flex items-center gap-2">
+                                            <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                            Publishing...
+                                        </span>
+                                    ) : (
+                                        <>
+                                            <TrendingUp size={14} />
+                                            Publish Version
+                                        </>
+                                    )}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

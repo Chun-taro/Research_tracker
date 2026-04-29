@@ -117,8 +117,9 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
         Route::get('/tickets', [\App\Http\Controllers\Landlord\SupportController::class, 'index'])->name('tickets.index');
         Route::patch('/tickets/{ticket}', [\App\Http\Controllers\Landlord\SupportController::class, 'update'])->name('tickets.update');
 
-        // Rollback
+        // Rollback & Publishing
         Route::post('/system/rollback', [\App\Http\Controllers\Landlord\DashboardController::class, 'rollback'])->name('system-rollback');
+        Route::post('/system/publish', [\App\Http\Controllers\Landlord\DashboardController::class, 'publishVersion'])->name('system-publish');
     });
 
     // ------- ADVISER ROUTES -------

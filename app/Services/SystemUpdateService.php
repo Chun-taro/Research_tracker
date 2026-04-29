@@ -265,4 +265,41 @@ class SystemUpdateService
 
         return $headers;
     }
+    /**
+     * Create a new Git Tag on GitHub.
+     */
+    public function publishTag($tagName)
+    {
+        $currentSha = $this->getCurrentVersion();
+        if ($currentSha === 'unknown') {
+            throw new \Exception("Cannot publish tag: Local Git version is unknown.");
+        }
+
+        try {
+            // 1. Create a Tag Object (Lightweight tags just need a ref)
+            // POST /repos/{owner}/{repo}/git/refs
+            $url = "https://api.github.com/repos/{$this->repoOwner}/{$this->repoName}/git/refs";
+            
+            $response = Http::withHeaders($this->getHeaders())->post($url, [
+                'ref' => "refs/tags/{$tagName}",
+                'sha' => $currentSha
+            ]);
+
+            if ($response->successful()) {
+                // Bust the version cache immediately
+                Cache::forget('app_version_tag');
+                Cache::forget('github_update_check');
+                return true;
+            }
+
+            $error = $response->json('message', 'Unknown GitHub Error');
+            if ($error && str_contains($error, 'already exists')) {
+                throw new \Exception("The tag '{$tagName}' already exists on GitHub.");
+            }
+
+            throw new \Exception("GitHub API Error: " . ($error ?? 'Unknown error'));
+        } catch (\Exception $e) {
+            throw new \Exception("Failed to publish tag: " . $e->getMessage());
+        }
+    }
 }
