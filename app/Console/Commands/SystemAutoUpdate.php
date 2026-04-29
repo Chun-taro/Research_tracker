@@ -2,7 +2,7 @@
 namespace App\Console\Commands;
 
 /**
- * Test Version: 1.0.3 - Cache Bypass Test
+ * Test Version: 1.0.4 - system:pull alias test
  */
 
 use App\Services\SystemUpdateService;
