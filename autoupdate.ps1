@@ -1,5 +1,6 @@
 # Research Tracker - Automated Watch & Update Script
 # This script runs in your terminal and keeps your system synced with GitHub.
+# Test Version: 1.0.5 - 10s Interval Test
 
 $Interval = 10 # Seconds between checks
 $Branch = "main"
