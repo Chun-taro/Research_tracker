@@ -38,6 +38,11 @@ while ($true) {
         
         Write-Host "Step 4/4: Building assets (this may take a minute)..." -ForegroundColor Magenta
         npm run build
+
+        Write-Host "Finalizing: Fetching tags and clearing cache..." -ForegroundColor Magenta
+        git fetch --tags origin
+        php artisan cache:clear
+        php artisan view:clear
         
         Write-Host "==============================================" -ForegroundColor Green
         Write-Host "  SYSTEM UPDATED SUCCESSFULLY!                " -ForegroundColor Green
