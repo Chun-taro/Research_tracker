@@ -25,7 +25,7 @@ class HandleInertiaRequests extends Middleware
             $tenant = Tenant::find($user->tenant_id);
         }
 
-        $isAdminOrLandlord = $user && ($user->role === 'admin' || $request->is('landlord*'));
+        $isAdminOrLandlord = $user && (in_array($user->role, ['admin', 'superadmin']) || $request->is('landlord*'));
         $updateCheck = $isAdminOrLandlord
             ? (new \App\Services\SystemUpdateService())->checkUpdate()
             : ['update_available' => false];

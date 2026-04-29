@@ -122,6 +122,7 @@ class SystemUpdateService
             $latestData = $this->fetchLatestCommit();
 
             if (!$latestData) {
+                \Log::warning("SystemUpdateService: Failed to fetch latest commit from GitHub.");
                 return [
                     'update_available' => false,
                     'error' => 'Could not connect to GitHub',
@@ -129,7 +130,9 @@ class SystemUpdateService
             }
 
             $latestHash = $latestData['sha'] ?? null;
-            $isNewer = $latestHash && $latestHash !== $currentHash;
+            $isNewer = $latestHash && trim($latestHash) !== trim($currentHash);
+
+            \Log::info("SystemUpdateService Check: Local={$currentHash}, Remote={$latestHash}, UpdateAvailable=" . ($isNewer ? 'YES' : 'NO'));
 
             return [
                 'update_available' => $isNewer,

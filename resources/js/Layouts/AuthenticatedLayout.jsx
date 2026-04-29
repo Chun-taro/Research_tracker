@@ -104,7 +104,7 @@ export default function AuthenticatedLayout({ children }) {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300',
+                                    'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 relative',
                                     active
                                         ? 'text-white shadow-lg shadow-gray-200/50 dark:shadow-none'
                                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'
@@ -116,6 +116,12 @@ export default function AuthenticatedLayout({ children }) {
                             >
                                 <Icon className={cn("h-5 w-5 flex-shrink-0 transition-transform duration-300", active && "scale-110")} size={20} />
                                 {!collapsed && <span className="truncate">{item.label}</span>}
+                                {item.label === 'System Updates' && auth.update_available && (
+                                    <span className="absolute right-3 top-3 flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                    </span>
+                                )}
                             </Link>
                         );
                     })}
