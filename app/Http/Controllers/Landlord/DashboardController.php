@@ -80,6 +80,8 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Critical error during rollback: ' . $e->getMessage());
         }
+    }
+
     public function publishVersion(Request $request, SystemUpdateService $updateService)
     {
         $request->validate([
