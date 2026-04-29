@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePage, useForm } from '@inertiajs/react';
 import {
     LayoutDashboard, Users, BookOpen, FileText, Upload, Archive,
@@ -58,7 +58,28 @@ export default function AuthenticatedLayout({ children }) {
     const themeColor = tenant?.theme_color ?? '#3B82F6';
 
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';
+    const [updateAvailable, setUpdateAvailable] = useState(auth.update_available);
     const { post, processing } = useForm({});
+
+    // Background Update Poller
+    useEffect(() => {
+        // Only poll if update isn't already known and user is an admin
+        const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+        if (!updateAvailable && isAdmin) {
+            const interval = setInterval(() => {
+                fetch(route('admin.system.updates.check'))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.update_available) {
+                            setUpdateAvailable(true);
+                        }
+                    })
+                    .catch(err => console.debug('Update check skipped:', err));
+            }, 30000); // Poll every 30 seconds
+            
+            return () => clearInterval(interval);
+        }
+    }, [updateAvailable, user]);
 
     const handleUpdate = () => {
         if (confirm('Are you sure you want to synchronize the system with the latest version from GitHub?')) {
@@ -125,7 +146,7 @@ export default function AuthenticatedLayout({ children }) {
                             >
                                 <Icon className={cn("h-5 w-5 flex-shrink-0 transition-transform duration-300", active && "scale-110")} size={20} />
                                 {!collapsed && <span className="truncate">{item.label}</span>}
-                                {item.label === 'System Updates' && auth.update_available && (
+                                {item.label === 'System Updates' && updateAvailable && (
                                     <span className="absolute right-3 top-3 flex h-2 w-2">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                         <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -193,7 +214,7 @@ export default function AuthenticatedLayout({ children }) {
 
                 {/* Page content */}
                 <main className="flex-1 overflow-auto p-4 lg:p-6">
-                    {auth.update_available && (
+                    {updateAvailable && (
                         <div className="mb-6 animate-in slide-in-from-top duration-500 overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4 shadow-sm">
                             <div className="flex items-center gap-4">
                                 <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">

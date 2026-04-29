@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
 
         // System Updates & Version Info
         Route::get('system/updates', [\App\Http\Controllers\Admin\SystemController::class, 'updates'])->name('system.updates');
+        Route::get('system/updates/check', [\App\Http\Controllers\Admin\SystemController::class, 'checkJson'])->name('system.updates.check');
         Route::post('system/updates/apply', [\App\Http\Controllers\Admin\SystemController::class, 'applyUpdate'])->name('system.updates.apply');
         Route::post('system/updates/rollback', [\App\Http\Controllers\Admin\SystemController::class, 'rollback'])->name('system.updates.rollback');
     });

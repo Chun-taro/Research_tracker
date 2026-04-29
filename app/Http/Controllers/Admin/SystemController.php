@@ -8,6 +8,11 @@ use Inertia\Inertia;
 
 class SystemController extends Controller
 {
+    public function checkJson(SystemUpdateService $updateService)
+    {
+        return response()->json($updateService->checkUpdate());
+    }
+
     public function updates(SystemUpdateService $updateService)
     {
         $versionTag = $updateService->getVersionTag();
