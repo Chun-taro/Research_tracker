@@ -11,7 +11,10 @@ class SystemAutoUpdate extends Command
      *
      * @var string
      */
-    protected $signature = 'system:auto-update {--force : Run update even if no new version is detected}';
+    protected $signature = 'system:auto-update 
+                            {--force : Run update even if no new version is detected} 
+                            {--watch : Keep running and check for updates continuously}
+                            {--interval=60 : Seconds to wait between checks when watching}';
 
     /**
      * The console command description.
@@ -25,7 +28,26 @@ class SystemAutoUpdate extends Command
      */
     public function handle(SystemUpdateService $updateService)
     {
-        $this->info('Checking for system updates...');
+        $watch = $this->option('watch');
+        $interval = (int) $this->option('interval');
+
+        if ($watch) {
+            $this->info("Entering watch mode. Checking for updates every {$interval} seconds...");
+            while (true) {
+                $this->checkAndApply($updateService);
+                sleep($interval);
+            }
+        } else {
+            return $this->checkAndApply($updateService);
+        }
+    }
+
+    /**
+     * Check for updates and apply if found.
+     */
+    protected function checkAndApply(SystemUpdateService $updateService)
+    {
+        $this->line('[' . now()->toDateTimeString() . '] Checking for updates...');
 
         $status = $updateService->checkUpdate();
 
@@ -37,20 +59,19 @@ class SystemAutoUpdate extends Command
             if ($result['success']) {
                 $this->info('System updated successfully!');
                 
-                // Detailed output log
                 if (isset($result['output'])) {
                     foreach ($result['output'] as $key => $out) {
                         $this->line("<fg=blue>[{$key}]</> " . trim($out));
                     }
                 }
+                return 0;
             } else {
                 $this->error('Failed to apply update: ' . $result['error']);
                 return 1;
             }
-        } else {
-            $this->info('System is already up to date.');
         }
 
+        $this->line('System is up to date.');
         return 0;
     }
 }
