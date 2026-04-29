@@ -231,23 +231,6 @@ class SystemUpdateService
     /**
      * Get common headers for GitHub API.
      */
-    protected function getHeaders()
-    {
-        $headers = [
-            'User-Agent' => 'ResearchTracker-SaaS-Update-Check',
-            'Accept' => 'application/vnd.github.v3+json',
-        ];
-
-        if ($this->token) {
-            $headers['Authorization'] = 'token ' . $this->token;
-        }
-
-        return $headers;
-    }
-
-    /**
-     * Fetch the latest commit from GitHub API.
-     */
     protected function fetchLatestCommit()
     {
         try {
@@ -257,10 +240,29 @@ class SystemUpdateService
             if ($response->successful()) {
                 return $response->json();
             }
+
+            \Log::error("SystemUpdateService: GitHub API returned status {$response->status()}: " . $response->body());
         } catch (\Exception $e) {
-            // Silently fail, we'll return false
+            \Log::error("SystemUpdateService: Connection error: " . $e->getMessage());
         }
 
         return null;
+    }
+
+    protected function getHeaders()
+    {
+        $headers = [
+            'User-Agent' => 'ResearchTracker-SaaS-Update-Check',
+            'Accept' => 'application/vnd.github.v3+json',
+        ];
+
+        if ($this->token) {
+            // Support both 'token' and 'Bearer' formats; Bearer is modern standard
+            $headers['Authorization'] = str_starts_with($this->token, 'github_pat') 
+                ? 'Bearer ' . $this->token 
+                : 'token ' . $this->token;
+        }
+
+        return $headers;
     }
 }
