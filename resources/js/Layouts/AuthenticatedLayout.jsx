@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, useForm } from '@inertiajs/react';
 import {
     LayoutDashboard, Users, BookOpen, FileText, Upload, Archive,
     Calendar, BarChart2, Settings, Bell, ChevronLeft, ChevronRight,
@@ -58,6 +58,15 @@ export default function AuthenticatedLayout({ children }) {
     const themeColor = tenant?.theme_color ?? '#3B82F6';
 
     const currentUrl = typeof window !== 'undefined' ? window.location.pathname : '';
+    const { post, processing } = useForm({});
+
+    const handleUpdate = () => {
+        if (confirm('Are you sure you want to synchronize the system with the latest version from GitHub?')) {
+            post(route('admin.system.updates.apply'), {
+                preserveScroll: true,
+            });
+        }
+    };
 
     return (
         <div className={cn("min-h-screen bg-gray-50 dark:bg-gray-950 flex transition-colors duration-500", context === 'portal' && 'theme-portal')}>
@@ -194,12 +203,22 @@ export default function AuthenticatedLayout({ children }) {
                                     <h4 className="text-sm font-bold text-amber-900 leading-tight">System Update Available</h4>
                                     <p className="text-xs text-amber-700/80 mt-0.5">Your device is behind the latest version on GitHub. Please run <code className="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-amber-900 border border-amber-200">git pull origin main</code> to synchronize your system.</p>
                                 </div>
-                                <div className="hidden sm:block">
+                                <div className="hidden sm:flex gap-2">
+                                    <button 
+                                        onClick={handleUpdate}
+                                        disabled={processing}
+                                        className={cn(
+                                            "px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-green-700 transition-all whitespace-nowrap disabled:opacity-50",
+                                            processing && "animate-pulse"
+                                        )}
+                                    >
+                                        {processing ? 'Updating...' : 'Apply Update Now'}
+                                    </button>
                                     <Link 
                                         href={context === 'landlord' ? '/landlord/system-history' : '/admin/system/updates'} 
-                                        className="px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-amber-600 transition-all whitespace-nowrap"
+                                        className="px-4 py-2 bg-amber-500/10 text-amber-600 text-xs font-bold rounded-xl hover:bg-amber-500/20 transition-all whitespace-nowrap"
                                     >
-                                        View Updates
+                                        View Changes
                                     </Link>
                                 </div>
                             </div>
