@@ -27,6 +27,7 @@ class Tenant extends BaseTenant
     protected $casts = [
         'subscription_expires_at' => 'datetime',
         'is_active' => 'boolean',
+        'institution_name' => 'encrypted',
     ];
 
     public function getDomainName(): string

@@ -13,7 +13,7 @@ This report compares your current **Research Tracker** implementation against th
 | **5. Pricing Model** | ✅ **Full Match** | Includes `Basic`, `Standard`, and `Premium` tiers with enforced restrictions (e.g., group limits). |
 | **6. Automatic Updates** | ✅ **Full Match** | A "One App" system where code updates in the central repository propagate to all tenants. Also integrates with GitHub Releases API for real-time version tracking in-app. |
 | **7. Security & Identity** | ✅ **Full Match** | Includes a Centralized Identity Hub (SSO) bridging multiple tenants securely, plus standard robust Laravel protections (Auth, CSRF, SQLi). |
-| **8. Data Encapsulation** | ✅ **Full Match** | Multi-database architecture provides the highest level of physical data separation. |
+| **8. Data Encapsulation** | ✅ **Full Match** | Multi-database architecture provides the highest level of physical data separation. Sensitive fields like `institution_name` are also encrypted at rest. |
 | **9. Centralized Support** | ✅ **Full Match** | Tenants have a built-in Support system to file tickets directly to the SaaS landlord. |
 
 ---
@@ -40,7 +40,8 @@ This report compares your current **Research Tracker** implementation against th
 - **In-App Tracking**: The system pings the GitHub Releases API (and falls back to local git tools) to dynamically fetch the latest system version and display full commit logs directly within the Landlord and Tenant admin dashboards.
 
 ### 6. Centralized Features
-- **Identity Hub (SSO)**: The landlord controls user provisioning centrally via the `landlord` database, bypassing complex localized hashing rules.
+- **Identity Hub (SSO)**: The landlord controls user provisioning centrally via the `landlord` database.
+- **Data Encryption**: Sensitive tenant metadata, specifically the `institution_name`, is protected using Laravel's AES-256 encryption (Casts), ensuring institutional privacy even within the database.
 - **Support Ticketing**: Tenants have a direct support channel inside the app that talks directly to the landlord's global monitoring console.
 
 ---

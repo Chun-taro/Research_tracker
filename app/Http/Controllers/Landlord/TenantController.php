@@ -66,7 +66,6 @@ class TenantController extends Controller
             'tenant_id' => $tenant->id,
             'name' => $validated['admin_name'],
             'email' => $validated['admin_email'],
-            'email_hash' => hash('sha256', $validated['admin_email']),
             'password' => Hash::make($validated['admin_password']),
             'role' => 'admin',
             'is_active' => true,
@@ -110,15 +109,12 @@ class TenantController extends Controller
                 // 2. Create Profile in Department
                 $tenant->makeCurrent();
 
-                $emailHash = hash('sha256', $request->admin_email);
-                
                 \App\Models\User::updateOrCreate(
                     ['email' => $request->admin_email],
                     [
                         'tenant_id' => $tenant->id,
                         'name' => $request->admin_name,
                         'email' => $request->admin_email,
-                        'email_hash' => $emailHash,
                         'password' => Hash::make($request->admin_password),
                         'role' => 'admin',
                         'is_active' => true,

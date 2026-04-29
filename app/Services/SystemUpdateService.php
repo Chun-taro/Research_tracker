@@ -86,7 +86,7 @@ class SystemUpdateService
      */
     public function getVersionTag(): string
     {
-        return Cache::remember('app_version_tag', 3600, function () {
+        return Cache::remember('app_version_tag', 10, function () {
             // 1. Try local git describe (fast, no network)
             try {
                 $tag = trim(shell_exec('git describe --tags --abbrev=0 2>&1'));
@@ -117,7 +117,7 @@ class SystemUpdateService
      */
     public function checkUpdate()
     {
-        return Cache::remember('github_update_check', 3600, function () {
+        return Cache::remember('github_update_check', 10, function () {
             $currentHash = $this->getCurrentVersion();
             $latestData = $this->fetchLatestCommit();
 

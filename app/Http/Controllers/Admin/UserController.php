@@ -56,7 +56,6 @@ class UserController extends Controller
             'tenant_id' => $tenant->id,
             'name' => $data['name'],
             'email' => $request->email,
-            'email_hash' => hash('sha256', $request->email),
             'password' => $hashedPassword,
             'role' => $data['role'],
             'phone' => $data['phone'] ?? null,
