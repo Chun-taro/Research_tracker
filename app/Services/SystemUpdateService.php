@@ -115,9 +115,13 @@ class SystemUpdateService
     /**
      * Check for updates from GitHub.
      */
-    public function checkUpdate()
+    public function checkUpdate($force = false)
     {
-        return Cache::remember('github_update_check', 10, function () {
+        if ($force) {
+            Cache::forget('github_update_check');
+        }
+
+        return Cache::remember('github_update_check', 1, function () {
             $currentHash = $this->getCurrentVersion();
             $latestData = $this->fetchLatestCommit();
 

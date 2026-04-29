@@ -53,7 +53,8 @@ class SystemAutoUpdate extends Command
     {
         $this->line('[' . now()->toDateTimeString() . '] Checking for updates...');
 
-        $status = $updateService->checkUpdate();
+        // Force a fresh check from GitHub, bypassing the 1-minute cache
+        $status = $updateService->checkUpdate(true);
 
         if (isset($status['update_available']) && $status['update_available'] || $this->option('force')) {
             $this->info('Update detected! Applying changes...');
