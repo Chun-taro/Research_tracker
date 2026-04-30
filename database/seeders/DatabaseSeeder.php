@@ -70,6 +70,9 @@ class DatabaseSeeder extends Seeder
         Artisan::call('migrate --database=tenant --path=database/migrations/tenant --force');
         $this->command->info("✅ Migrated Tenant DB: {$dbName}");
 
+        // Seed tenant modules and other records
+        $this->call(ModuleSeeder::class);
+
         // Now seed the tenant database
         // NOTE: Since the tenant is now current, all Eloquent calls for tenant models 
         // will automatically use the correct connection because SwitchTenantDatabaseTask swapped it.

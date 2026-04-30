@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\RepositoryController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\Support\SupportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'verified', 'tenant.active'])->group(function () {
 
         // User Management
         Route::resource('users', UserController::class);
+        Route::resource('modules', ModuleController::class);
         Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
         // Research Cycles
